@@ -1,6 +1,9 @@
-# Node.js dependencies
+# Node.js 
 node_modules/
 npm-debug.log
 
-# VS Code directories
+# VS Code 
 .vscode/
+
+# env file
+.env
