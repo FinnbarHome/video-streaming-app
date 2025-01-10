@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+combiner.py
+combined.txt
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
