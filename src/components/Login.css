@@ -1,35 +1,39 @@
-/* Styles for the login container */
-.login-container {
+.login-background {
+    height: 100vh;
     display: flex;
-    flex-direction: column;
     align-items: center;
-    width: 300px;
-    background-color: #2e2e2e; /* Grey background */
+    justify-content: center;
+    background-image: url('/LoginBackground.jpg'); 
+    background-size: cover; 
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .login-container {
+    background-color: rgba(46, 46, 46, 0.9); /* Slightly transparent background */
     padding: 20px;
     border-radius: 8px;
-    color: #f8f8f8; /* Off-white text */
-}
-
-/* Styles for the login title */
-.login-title {
-    color: #f8f8f8; /* Off-white text */
+    color: #f8f8f8;
+    width: 300px;
+  }
+  
+  .login-title {
+    color: #f8f8f8;
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 10px;
-}
-
-/* Styles for the inputs */
-.login-input {
+  }
+  
+  .login-input {
     padding: 10px;
     margin: 10px 0;
     width: 100%;
     font-size: 16px;
     border-radius: 4px;
     border: 1px solid #ccc;
-}
-
-/* Styles for the login button */
-.login-button {
+  }
+  
+  .login-button {
     padding: 10px 20px;
     background-color: #007BFF;
     color: #fff;
@@ -37,14 +41,14 @@
     border-radius: 5px;
     cursor: pointer;
     width: 100%;
-}
-
-.login-button:hover {
+  }
+  
+  .login-button:hover {
     background-color: #0056b3;
-}
-
-/* Styles for the error message */
-.login-error {
+  }
+  
+  .login-error {
     color: red;
     margin-top: 10px;
-}
+  }
+  
