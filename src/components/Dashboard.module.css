@@ -1,4 +1,4 @@
-body, .dashboard {
+.dashboard {
     margin: 0;
     padding: 0;
     display: flex;
@@ -23,7 +23,7 @@ body, .dashboard {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.navbar-left {
+.navbarLeft {
     display: flex;
     align-items: center;
 }
@@ -35,7 +35,7 @@ body, .dashboard {
     margin-right: 20px;
 }
 
-.nav-links {
+.navLinks {
     list-style: none;
     display: flex;
     gap: 20px;
@@ -43,26 +43,26 @@ body, .dashboard {
     padding: 0;
 }
 
-.nav-links li {
+.navLinks li {
     font-size: 1rem;
 }
 
-.nav-links a {
+.navLinks a {
     color: #fff;
     text-decoration: none;
     transition: color 0.3s;
 }
 
-.nav-links a:hover {
+.navLinks a:hover {
     color: #e50914;
 }
 
-.navbar-right {
+.navbarRight {
     display: flex;
     align-items: center;
 }
 
-.search-input {
+.searchInput {
     padding: 8px 12px;
     border: none;
     border-radius: 20px;
@@ -74,29 +74,15 @@ body, .dashboard {
     width: 200px;
 }
 
-.search-input::placeholder {
+.searchInput::placeholder {
     color: #aaa;
 }
 
-.search-input:focus {
+.searchInput:focus {
     background-color: #444;
 }
 
 /* Content Section */
-.content {
-    text-align: center;
-    margin: 50px 0;
-}
-
-.content h2 {
-    font-size: 2rem;
-}
-
-.content p {
-    font-size: 1.2rem;
-    margin-top: 10px;
-    color: #ccc;
-}
 
 /* Carousel Section */
 .carousel {
@@ -105,20 +91,19 @@ body, .dashboard {
     margin-top: 50px;
 }
 
-.carousel-container {
+.carouselContainer {
     display: flex;
     overflow: hidden; 
     width: 100%; 
 }
 
-.carousel-track {
+.carouselTrack {
     display: flex;
     transition: transform 0.5s ease;
     will-change: transform; 
 }
 
-
-.carousel-item {
+.carouselItem {
     flex: 0 0 calc(100% / 3); 
     max-width: calc(100% / 3); 
     aspect-ratio: 16 / 9; 
@@ -129,14 +114,14 @@ body, .dashboard {
     margin: 0 5px; 
 }
 
-.carousel-item img {
+.carouselItem img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
 /* Carousel arrows */
-.carousel-arrow {
+.carouselArrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
@@ -153,27 +138,27 @@ body, .dashboard {
     align-items: center;
 }
 
-.carousel-arrow.left {
+.carouselArrow.left {
     left: 10px;
 }
 
-.carousel-arrow.right {
+.carouselArrow.right {
     right: 10px;
 }
 
-.carousel-arrow:hover {
+.carouselArrow:hover {
     background-color: rgba(0, 0, 0, 0.8);
 }
 
 @media (max-width: 1200px) {
-    .carousel-item {
+    .carouselItem {
         flex: 0 0 calc(100% / 2); 
         max-width: calc(100% / 2);
     }
 }
 
 @media (max-width: 768px) {
-    .carousel-item {
+    .carouselItem {
         flex: 0 0 100%; 
         max-width: 100%;
     }
@@ -186,14 +171,14 @@ body, .dashboard {
     text-align: center;
 }
 
-.grid-container {
+.gridContainer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(calc(16 / 9 * 200px), 1fr));
     gap: 10px;
     padding: 0 10px;
 }
 
-.grid-item {
+.gridItem {
     width: 100%;
     aspect-ratio: 16 / 9; 
     border-radius: 10px;
@@ -202,12 +187,12 @@ body, .dashboard {
     transition: transform 0.3s ease;
 }
 
-.grid-item img {
+.gridItem img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
 
-.grid-item:hover {
+.gridItem:hover {
     transform: scale(1.05);
 }

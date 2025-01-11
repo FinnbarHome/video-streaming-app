@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import './Dashboard.css';
+import styles from './Dashboard.module.css';
 
 const Dashboard: React.FC = () => {
   const originalImages = [
@@ -46,75 +46,78 @@ const Dashboard: React.FC = () => {
   }, []);
 
   return (
-    <div className="dashboard">
+    <div className={styles.dashboard}>
       {/* NAVBAR */}
-      <nav className="navbar">
-        <div className="navbar-left">
-          <h1 className="logo">The Streamy Place</h1>
-          <ul className="nav-links">
+      <nav className={styles.navbar}>
+        <div className={styles.navbarLeft}>
+          <h1 className={styles.logo}>The Streamy Place</h1>
+          <ul className={styles.navLinks}>
             <li><a href="#home">Home</a></li>
             <li><a href="#watchlist">Watchlist</a></li>
             <li><a href="#history">Watch History</a></li>
           </ul>
         </div>
-        <div className="navbar-right">
+        <div className={styles.navbarRight}>
           <input
             type="text"
-            className="search-input"
+            className={styles.searchInput}
             placeholder="Search movies, shows..."
           />
         </div>
       </nav>
 
+
       {/* CONTENT */}
-      <div className="content">
+      <div className={styles.content}>
         <h2>Welcome to The Streamy Place</h2>
         <p>Start exploring your favorite movies and shows!</p>
       </div>
 
       {/* CAROUSEL SECTION */}
-      <div className="carousel">
-        <h3 className="section-title">Top Picks for You</h3>
-        
-        <button className="carousel-arrow left" onClick={handlePrev}>
+      <div className={styles.carousel}>
+        <h3 className={styles.sectionTitle}>Top Picks for You</h3>
+          
+        <button className={`${styles.carouselArrow} ${styles.left}`} onClick={handlePrev}>
           &#8249;
         </button>
-        
-        <div className="carousel-container">
-          <div
-            className="carousel-track"
-            // Translate the track left by (currentIndex * 100%) / visibleItems
-            style={{
-              transform: `translateX(-${
-                (currentIndex * 100) / visibleItems
-              }%)`,
-              transition: `transform ${transitionDuration}s ease`,
-            }}
-          >
-            {repeatedImages.map((src, idx) => (
-              <div className="carousel-item" key={idx}>
-                <img src={src} alt={`Show ${idx + 1}`} />
-              </div>
-            ))}
-          </div>
+          
+        <div className={styles.carouselContainer}>
+            <div
+              className={styles.carouselTrack}
+              // Translate the track left by (currentIndex * 100%) / visibleItems
+              style={{
+                transform: `translateX(-${
+                  (currentIndex * 100) / visibleItems
+                }%)`,
+                transition: `transform ${transitionDuration}s ease`,
+              }}
+            >
+              {repeatedImages.map((src, idx) => (
+        <div className={styles.carouselItem} key={idx}>
+          <img src={src} alt={`Show ${idx + 1}`} />
+        </div>
+        ))}
+
+            </div>
         </div>
 
-        <button className="carousel-arrow right" onClick={handleNext}>
+        <button className={`${styles.carouselArrow} ${styles.right}`} onClick={handleNext}>
           &#8250;
         </button>
       </div>
 
       {/* GRID SECTION */}
-      <div className="grid">
-        <h3 className="section-title">Browse Other Shows</h3>
-        <div className="grid-container">
+      <div className={styles.grid}>
+        <h3 className={styles.sectionTitle}>Browse Other Shows</h3>
+        <div className={styles.gridContainer}>
           {originalImages.map((image, index) => (
-            <div className="grid-item" key={index}>
+            <div className={styles.gridItem} key={index}>
               <img src={image} alt={`Show ${index + 1}`} />
             </div>
           ))}
         </div>
       </div>
+
     </div>
   );
 };

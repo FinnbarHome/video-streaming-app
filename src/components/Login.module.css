@@ -1,5 +1,16 @@
-.login-background {
-    height: 100vh;
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+  
+.loginBackground {
+    width: 100vw; 
+    height: 100vh; 
     display: flex;
     align-items: center;
     justify-content: center;
@@ -7,10 +18,12 @@
     background-size: cover; 
     background-position: center;
     background-repeat: no-repeat;
-    position: relative; 
+    position: absolute; 
+    top: 0;
+    left: 0;
 }
-  
-.login-container {
+
+.loginContainer {
     background-color: rgba(46, 46, 46, 0.9); 
     padding: 20px;
     border-radius: 8px;
@@ -19,7 +32,7 @@
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
 }
   
-.login-title {
+.loginTitle {
     color: #f8f8f8;
     font-size: 24px;
     font-weight: bold;
@@ -27,7 +40,7 @@
     text-align: center;
 }
   
-.login-input {
+.loginInput {
     padding: 10px;
     margin: 10px 0; 
     width: 100%;
@@ -39,13 +52,13 @@
     box-sizing: border-box;
 }
 
-.login-input:focus {
+.loginInput:focus {
     outline: none;
     border-color: #007bff; 
     box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); 
 }
   
-.login-button {
+.loginButton {
     padding: 10px 20px;
     background-color: #007BFF;
     color: white;
@@ -56,18 +69,18 @@
     font-size: 16px;
 }
   
-.login-button:hover {
+.loginButton:hover {
     background-color: #0056b3;
 }
 
-.login-error {
+.loginError {
     color: red;
     margin-top: 10px;
     font-size: 14px;
     text-align: center;
 }
 
-.image-credit {
+.imageCredit {
     position: absolute;
     bottom: 10px;
     right: 10px;
@@ -77,11 +90,11 @@
     text-align: right;
 }
 
-.image-credit a {
+.imageCredit a {
     color: #f8f8f8;
     text-decoration: none; 
 }
 
-.image-credit a:hover {
+.imageCredit a:hover {
     text-decoration: underline;
 }
