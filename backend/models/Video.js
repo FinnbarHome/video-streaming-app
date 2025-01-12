@@ -9,8 +9,11 @@ const videoSchema = new mongoose.Schema({
     type: String,
     required: false,
   },
-  // This could point to an S3/CloudFront or other CDN URL
   videoUrl: {
+    type: String,
+    required: true,
+  },
+  thumbnailUrl: {
     type: String,
     required: true,
   },
