@@ -1,3 +1,4 @@
+// routes/videoRoutes.js
 const express = require('express');
 const Video = require('../models/Video');
 
@@ -6,17 +7,22 @@ const router = express.Router();
 /**
  * Create a video:
  * POST /api/videos
- * body: { videoName, videoDescription, videoUrl }
+ * body: { videoName, videoDescription, videoUrl, thumbnailUrl }
  */
 router.post('/', async (req, res) => {
   try {
-    const { videoName, videoDescription, videoUrl } = req.body;
-    if (!videoName || !videoUrl) {
+    const { videoName, videoDescription, videoUrl, thumbnailUrl } = req.body;
+    if (!videoName || !videoUrl || !thumbnailUrl) {
       return res
         .status(400)
-        .json({ error: 'videoName and videoUrl are required' });
+        .json({ error: 'videoName, videoUrl, and thumbnailUrl are required' });
     }
-    const video = new Video({ videoName, videoDescription, videoUrl });
+    const video = new Video({
+      videoName,
+      videoDescription,
+      videoUrl,
+      thumbnailUrl,
+    });
     await video.save();
     return res.status(201).json({ message: 'Video created', video });
   } catch (err) {
