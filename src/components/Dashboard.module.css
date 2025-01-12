@@ -6,8 +6,23 @@
     align-items: center;
     background-color: #141414;
     color: #fff;
-    width: 100%;
+    width: 100%; /* make sure we can expand fully */
+  }
+.slick-prev::before,
+.slick-next::before {
+  color: #fff; /* White arrow icons */
+  font-size: 2rem;
 }
+
+.slick-dots li button:before {
+  font-size: 0.75rem;
+  color: #fff;
+}
+.slick-dots li.slick-active button:before {
+  color: #e50914; /* Netflix-like red for active dot */
+}
+
+
 
 /* Navbar Section */
 .navbar {
@@ -100,15 +115,23 @@
 
 /* Carousel Section */
 .carousel {
-    width: 100%; 
-    position: relative; 
+    /* 
+      Instead of 100%, let's make it narrower so we see 
+      only ~1 item center plus a partial next item 
+    */
+    width: 95%;
     margin-top: 50px;
+    margin: 50px auto;
+    position: relative; 
 }
+
+
+
 
 .carouselContainer {
     display: flex;
-    overflow: hidden; 
-    width: 100%; 
+    overflow: hidden;
+    width: 100%;
 }
 
 .carouselTrack {
@@ -118,15 +141,14 @@
 }
 
 .carouselItem {
-    flex: 0 0 calc(100% / 3); 
-    max-width: calc(100% / 3); 
-    aspect-ratio: 16 / 9; 
-    position: relative;
+    /* Keep or tweak as needed to set aspect ratio, etc. */
+    aspect-ratio: 16 / 9;
     overflow: hidden;
-    background-color: #222;
     border-radius: 10px;
-    margin: 0 5px; 
-}
+    background-color: #222;
+    margin: 0 5px;
+  }
+  
 
 .carouselItem img {
     width: 100%;
@@ -209,4 +231,26 @@
 
 .gridItem:hover {
     transform: scale(1.05);
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999; 
+}
+  
+.modalContent {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    color: #fff;
+    text-align: center;
 }

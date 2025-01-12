@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Video = require('../models/Video');
 
+
 const router = express.Router();
 
 /**
@@ -138,6 +139,91 @@ router.post('/:userId/history', async (req, res) => {
     });
   } catch (err) {
     console.error('Watch History Error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+router.get('/:userId/watchlist', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    // Find the user and populate the watchlist
+    const user = await User.findById(userId).populate('watchlist.videoId');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // Extract the Video objects
+    const videos = user.watchlist.map(item => item.videoId);
+    return res.status(200).json(videos);
+  } catch (err) {
+    console.error('Get Watchlist Error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * Get the user's watch history
+ * GET /api/users/:userId/history
+ */
+router.get('/:userId/history', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId).populate('watchHistory.videoId');
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    // Extract the Video objects
+    const videos = user.watchHistory.map(item => item.videoId);
+    return res.status(200).json(videos);
+  } catch (err) {
+    console.error('Get History Error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * Remove a video from watchlist:
+ * DELETE /api/users/:userId/watchlist/:videoId
+ */
+router.delete('/:userId/watchlist/:videoId', async (req, res) => {
+  try {
+    const { userId, videoId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Filter out the watchlist item whose videoId matches
+    user.watchlist = user.watchlist.filter(
+      (item) => item.videoId.toString() !== videoId
+    );
+
+    await user.save();
+    return res.status(200).json({ message: 'Video removed from watchlist', user });
+  } catch (err) {
+    console.error('Remove from Watchlist Error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+/**
+ * Clear watch history:
+ * DELETE /api/users/:userId/history
+ * Removes all watchHistory items
+ */
+router.delete('/:userId/history', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.watchHistory = []; // empty array
+    await user.save();
+
+    return res.status(200).json({ message: 'Watch history cleared', user });
+  } catch (err) {
+    console.error('Clear History Error:', err);
     return res.status(500).json({ error: 'Internal server error' });
   }
 });

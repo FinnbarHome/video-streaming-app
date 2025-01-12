@@ -1,49 +1,106 @@
-import React, { useState, useCallback } from 'react';
+// Dashboard.tsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; // So we can programmatically navigate
+import Slider from 'react-slick';
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import styles from './Dashboard.module.css';
 
+interface Video {
+  _id: string;
+  videoName: string;
+  videoDescription: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+}
+
 const Dashboard: React.FC = () => {
-  const originalImages = [
-    '/testImages/test-image1.jpg',
-    '/testImages/test-image2.jpg',
-    '/testImages/test-image3.jpg',
-    '/testImages/test-image4.jpg',
-    '/testImages/test-image5.jpg',
-    '/testImages/test-image6.jpg',
-    '/testImages/test-image7.jpg',
-    '/testImages/test-image8.jpg',
-    '/testImages/test-image9.jpg',
-    '/testImages/test-image10.jpg',
-    '/testImages/test-image11.jpg',
-    '/testImages/test-image12.jpg',
-  ];
+  const navigate = useNavigate();
 
-  // Number of items visible at once
-  const visibleItems = 3;
+  // In a real app, you'd get this from context, redux, or localStorage
+  const userId = localStorage.getItem('userId');
 
-  // How many times to repeat the original images so the user can keep scrolling
-  const REPEAT_FACTOR = 20;
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
 
-  // Create a long array by repeating originalImages multiple times.
-  const repeatedImages = Array.from(
-    { length: originalImages.length * REPEAT_FACTOR },
-    (_, i) => originalImages[i % originalImages.length]
-  );
-
-  // Current index (starting at 0). This will keep incrementing as the user presses Next.
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  // Slide transition duration (in seconds)
-  const transitionDuration = 0.5;
-
-  // Move to the next slide
-  const handleNext = useCallback(() => {
-    setCurrentIndex((prevIndex) => prevIndex + 1);
+  // Fetch videos on mount
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/api/videos');
+        const data = await response.json();
+        setVideos(data);
+      } catch (err) {
+        console.error('Failed to fetch videos:', err);
+      }
+    };
+    fetchVideos();
   }, []);
 
-  // Move to the previous slide
-  const handlePrev = useCallback(() => {
-    setCurrentIndex((prevIndex) => Math.max(prevIndex - 1, 0));
-  }, []);
+  // Whenever the user clicks a thumbnail, we open the modal
+  // AND we also add it to their "view history"
+  const handleThumbnailClick = async (video: Video) => {
+    setSelectedVideo(video);
+    try {
+      // Add to user history
+      await fetch(`http://localhost:3000/api/users/${userId}/history`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId: video._id }),
+      });
+      // Optionally handle errors or success
+    } catch (err) {
+      console.error('Failed to add to history:', err);
+    }
+  };
+
+  // Close the detail modal
+  const closeDetailModal = () => {
+    setSelectedVideo(null);
+  };
+
+  // Add the selected video to watchlist
+  const handleAddToWatchlist = async () => {
+    if (!selectedVideo) return;
+    try {
+      const response = await fetch(`http://localhost:3000/api/users/${userId}/watchlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ videoId: selectedVideo._id }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        console.error('Error adding to watchlist:', data.error);
+      } else {
+        console.log('Successfully added to watchlist');
+      }
+    } catch (err) {
+      console.error('Failed to add to watchlist:', err);
+    }
+  };
+
+  // React Slick settings
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 4,   // how many you want in wide screen
+    slidesToScroll: 1,
+    responsive: [
+      {
+        breakpoint: 1200,
+        settings: { slidesToShow: 3 },
+      },
+      {
+        breakpoint: 768,
+        settings: { slidesToShow: 2 },
+      },
+      {
+        breakpoint: 480,
+        settings: { slidesToShow: 1 },
+      },
+    ],
+  };
 
   return (
     <div className={styles.dashboard}>
@@ -52,72 +109,93 @@ const Dashboard: React.FC = () => {
         <div className={styles.navbarLeft}>
           <h1 className={styles.logo}>The Streamy Place</h1>
           <ul className={styles.navLinks}>
-            <li><a href="#home">Home</a></li>
-            <li><a href="#watchlist">Watchlist</a></li>
-            <li><a href="#history">Watch History</a></li>
+            {/* Use onClick + navigate or <Link to="/dashboard"> */}
+            <li><a onClick={() => navigate('/dashboard')}>Home</a></li>
+            <li><a onClick={() => navigate('/watchlist')}>Watchlist</a></li>
+            <li><a onClick={() => navigate('/watchhistory')}>Watch History</a></li>
           </ul>
         </div>
         <div className={styles.navbarRight}>
           <input
             type="text"
             className={styles.searchInput}
-            placeholder="Search movies, shows..."
+            placeholder="Search videos..."
           />
         </div>
       </nav>
 
-
       {/* CONTENT */}
       <div className={styles.content}>
         <h2>Welcome to The Streamy Place</h2>
-        <p>Start exploring your favorite movies and shows!</p>
+        <p>Start exploring your favorite videos!</p>
       </div>
 
-      {/* CAROUSEL SECTION */}
+      {/* CAROUSEL SECTION (Using react-slick) */}
       <div className={styles.carousel}>
         <h3 className={styles.sectionTitle}>Top Picks for You</h3>
-          
-        <button className={`${styles.carouselArrow} ${styles.left}`} onClick={handlePrev}>
-          &#8249;
-        </button>
-          
-        <div className={styles.carouselContainer}>
+
+        <Slider {...sliderSettings}>
+          {videos.map((video) => (
             <div
-              className={styles.carouselTrack}
-              // Translate the track left by (currentIndex * 100%) / visibleItems
-              style={{
-                transform: `translateX(-${
-                  (currentIndex * 100) / visibleItems
-                }%)`,
-                transition: `transform ${transitionDuration}s ease`,
-              }}
+              key={video._id}
+              className={styles.carouselItem}
+              onClick={() => handleThumbnailClick(video)}
             >
-              {repeatedImages.map((src, idx) => (
-        <div className={styles.carouselItem} key={idx}>
-          <img src={src} alt={`Show ${idx + 1}`} />
-        </div>
-        ))}
-
+              <img
+                src={video.thumbnailUrl}
+                alt={video.videoName}
+                style={{ width: '100%', cursor: 'pointer' }}
+              />
             </div>
-        </div>
-
-        <button className={`${styles.carouselArrow} ${styles.right}`} onClick={handleNext}>
-          &#8250;
-        </button>
+          ))}
+        </Slider>
       </div>
 
       {/* GRID SECTION */}
       <div className={styles.grid}>
-        <h3 className={styles.sectionTitle}>Browse Other Shows</h3>
+        <h3 className={styles.sectionTitle}>Browse Other Videos</h3>
         <div className={styles.gridContainer}>
-          {originalImages.map((image, index) => (
-            <div className={styles.gridItem} key={index}>
-              <img src={image} alt={`Show ${index + 1}`} />
+          {videos.map((video) => (
+            <div
+              className={styles.gridItem}
+              key={video._id}
+              onClick={() => handleThumbnailClick(video)}
+            >
+              <img
+                src={video.thumbnailUrl}
+                alt={video.videoName}
+                style={{ cursor: 'pointer' }}
+              />
             </div>
           ))}
         </div>
       </div>
 
+      {/* Modal Overlay for Video Detail */}
+      {selectedVideo && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalContent}>
+            <h2>{selectedVideo.videoName}</h2>
+            <p>{selectedVideo.videoDescription}</p>
+
+            <video
+              src={selectedVideo.videoUrl}
+              controls
+              style={{ width: '100%', marginTop: '20px' }}
+            />
+            {/* Button to add to watchlist */}
+            <button
+              onClick={handleAddToWatchlist}
+              style={{ marginTop: '10px', marginRight: '10px' }}
+            >
+              Add to Watchlist
+            </button>
+            <button onClick={closeDetailModal} style={{ marginTop: '10px' }}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

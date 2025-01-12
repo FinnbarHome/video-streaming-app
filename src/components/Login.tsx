@@ -21,12 +21,15 @@ const Login: React.FC = () => {
         body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
+  
       if (!response.ok) {
-        // If login fails, show error
         setError(data.error || 'Login failed. Please try again.');
       } else {
-        // Login successful
+        // Store userId in localStorage
         console.log('Login success:', data);
+        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('username', data.username);
+        // Now navigate
         navigate('/dashboard');
       }
     } catch (err) {
@@ -45,12 +48,14 @@ const Login: React.FC = () => {
       });
       const data = await response.json();
       if (!response.ok) {
-        // If registration fails, show error
         setError(data.error || 'Registration failed. Please try again.');
       } else {
         console.log('Registration success:', data);
-        // Optionally, auto-login or just switch to login mode
-        // For simplicity, let's just navigate to /dashboard:
+        // Store userId in localStorage
+        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('username', data.username);
+  
+        // navigate to dashboard
         navigate('/dashboard');
       }
     } catch (err) {

@@ -1,0 +1,95 @@
+.historyPage {
+    background-color: #141414;
+    min-height: 100vh;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #000;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .navbarLeft {
+    display: flex;
+    align-items: center;
+  }
+  
+  .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e50914;
+    margin-right: 20px;
+  }
+  
+  .navLinks {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+  }
+  
+  .navLinks li {
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  
+  .navLinks li:hover {
+    color: #e50914;
+  }
+  
+  .content {
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .content h2 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  .gridContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+  
+  .gridItem {
+    background-color: #222;
+    border-radius: 8px;
+    overflow: hidden;
+    padding: 10px;
+    transition: transform 0.3s;
+    text-align: center;
+  }
+  
+  .gridItem img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+  
+  .gridItem h3 {
+    margin-top: 10px;
+    font-size: 1.2rem;
+  }
+  
+  .gridItem p {
+    color: #ccc;
+    font-size: 0.9rem;
+    margin: 5px 0;
+  }
+  
+  .gridItem:hover {
+    transform: scale(1.02);
+  }
+  
