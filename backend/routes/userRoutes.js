@@ -1,8 +1,11 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const passport = require('passport');
 const User = require('../models/User');
 const Video = require('../models/Video');
 
+const SECRET_KEY = process.env.JWT_SECRET || 'somefallbacksecret';
 
 const router = express.Router();
 
@@ -17,16 +20,12 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Username and password required' });
     }
 
-    // Check for existing user
     const existingUser = await User.findOne({ username });
     if (existingUser) {
       return res.status(409).json({ error: 'Username already exists' });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
     const newUser = new User({ username, password: hashedPassword });
     await newUser.save();
 
@@ -45,34 +44,33 @@ router.post('/register', async (req, res) => {
  * Login:
  * POST /api/users/login
  */
-router.post('/login', async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    if (!username || !password) {
-      return res.status(400).json({ error: 'Username and password required' });
+router.post('/login', (req, res, next) => {
+  // Use the local strategy defined in passport.js
+  passport.authenticate('local', { session: false }, (err, user, info) => {
+    if (err) {
+      console.error('Login Error:', err);
+      return res.status(500).json({ error: 'Internal server error' });
     }
-
-    // Find user
-    const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      // Means invalid credentials
+      return res.status(401).json({ error: info?.message || 'Invalid credentials' });
     }
 
-    // Compare password
-    const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    return res.status(200).json({
-      message: 'Login successful',
+    // If user is found, create JWT
+    const payload = {
       userId: user._id,
       username: user.username,
+    };
+    // Token valid for 1 day (example)
+    const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1d' });
+
+    return res.json({
+      message: 'Login successful',
+      token,
+      userId: user._id,   // We can still send these for convenience
+      username: user.username,
     });
-  } catch (err) {
-    console.error('Login Error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
-  }
+  })(req, res, next);
 });
 
 /**

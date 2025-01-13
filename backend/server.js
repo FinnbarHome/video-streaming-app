@@ -7,6 +7,8 @@ const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const connectDB = require('./utils/connectDB');
 const mongoose = require('mongoose');
+const passport = require('passport');
+require('./config/passport'); // Passport config
 
 // Import your route files
 const userRoutes = require('./routes/userRoutes');
@@ -27,6 +29,9 @@ app.use(cors());
 app.use(express.json());
 app.use(compression());
 app.use(morgan('combined'));
+
+// Initialize Passport
+app.use(passport.initialize());
 
 // Connect to MongoDB Atlas 
 if (require.main === module) {

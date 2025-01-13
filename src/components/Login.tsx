@@ -25,8 +25,10 @@ const Login: React.FC = () => {
       if (!response.ok) {
         setError(data.error || 'Login failed. Please try again.');
       } else {
-        // Store userId in localStorage
         console.log('Login success:', data);
+        // data.token is our JWT
+        localStorage.setItem('token', data.token);
+        // We can still store userId if we want
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', data.username);
         // Now navigate
