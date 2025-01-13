@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard'; // New Page Component
+import Dashboard from './components/Dashboard'; 
 import Watchlist from './components/Watchlist';
 import WatchHistory from './components/WatchHistory';
 

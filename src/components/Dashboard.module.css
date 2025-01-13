@@ -6,11 +6,11 @@
     align-items: center;
     background-color: #141414;
     color: #fff;
-    width: 100%; /* make sure we can expand fully */
+    width: 100%; 
   }
 .slick-prev::before,
 .slick-next::before {
-  color: #fff; /* White arrow icons */
+  color: #fff; 
   font-size: 2rem;
 }
 
@@ -19,10 +19,8 @@
   color: #fff;
 }
 .slick-dots li.slick-active button:before {
-  color: #e50914; /* Netflix-like red for active dot */
+  color: #e50914;
 }
-
-
 
 /* Navbar Section */
 .navbar {
@@ -115,18 +113,11 @@
 
 /* Carousel Section */
 .carousel {
-    /* 
-      Instead of 100%, let's make it narrower so we see 
-      only ~1 item center plus a partial next item 
-    */
     width: 95%;
     margin-top: 50px;
     margin: 50px auto;
     position: relative; 
 }
-
-
-
 
 .carouselContainer {
     display: flex;
@@ -141,7 +132,6 @@
 }
 
 .carouselItem {
-    /* Keep or tweak as needed to set aspect ratio, etc. */
     aspect-ratio: 16 / 9;
     overflow: hidden;
     border-radius: 10px;
