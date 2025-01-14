@@ -13,6 +13,8 @@ interface Video {
   thumbnailUrl: string;
 }
 
+const API_BASE_URL = '/api';
+
 const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const userId = localStorage.getItem('userId');
@@ -28,7 +30,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/videos');
+        const response = await fetch(`${API_BASE_URL}/videos`);
         const data = await response.json();
         setVideos(data);
       } catch (err) {
@@ -43,7 +45,7 @@ const Dashboard: React.FC = () => {
     setSelectedVideo(video);
     try {
       if (userId) {
-        await fetch(`http://localhost:3000/api/users/${userId}/history`, {
+        await fetch(`${API_BASE_URL}/users/${userId}/history`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ videoId: video._id }),
@@ -63,7 +65,7 @@ const Dashboard: React.FC = () => {
   const handleAddToWatchlist = async () => {
     if (!selectedVideo || !userId) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/users/${userId}/watchlist`, {
+      const response = await fetch(`${API_BASE_URL}/users/${userId}/watchlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ videoId: selectedVideo._id }),
@@ -87,7 +89,7 @@ const Dashboard: React.FC = () => {
     }
     try {
       const response = await fetch(
-        `http://localhost:3000/api/videos/search?query=${encodeURIComponent(searchTerm)}`
+        `${API_BASE_URL}/videos/search?query=${encodeURIComponent(searchTerm)}`
       );
       const data = await response.json();
       setSearchResults(data);

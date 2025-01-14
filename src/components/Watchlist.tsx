@@ -10,6 +10,8 @@ interface Video {
   thumbnailUrl: string;
 }
 
+const API_BASE_URL = '/api';
+
 const Watchlist: React.FC = () => {
   const navigate = useNavigate();
   const [videos, setVideos] = useState<Video[]>([]);
@@ -20,7 +22,7 @@ const Watchlist: React.FC = () => {
       if (!userId) return;
       try {
         const response = await fetch(
-          `http://localhost:3000/api/users/${userId}/watchlist`
+          `${API_BASE_URL}/users/${userId}/watchlist`
         );
         const data = await response.json();
         setVideos(data);
@@ -36,7 +38,7 @@ const Watchlist: React.FC = () => {
     if (!userId) return;
     try {
       const response = await fetch(
-        `http://localhost:3000/api/users/${userId}/watchlist/${videoId}`,
+        `${API_BASE_URL}/users/${userId}/watchlist/${videoId}`,
         {
           method: 'DELETE',
         }
