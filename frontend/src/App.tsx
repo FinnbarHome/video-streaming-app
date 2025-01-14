@@ -1,7 +1,9 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
-import Dashboard from './components/Dashboard'; // New Page Component
+import Dashboard from './components/Dashboard'; 
+import Watchlist from './components/Watchlist';
+import WatchHistory from './components/WatchHistory';
 
 const App: React.FC = () => {
     return (
@@ -9,6 +11,8 @@ const App: React.FC = () => {
             <Routes>
                 <Route path="/" element={<Login />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/watchlist" element={<Watchlist/>} />
+                <Route path="/watchhistory" element={<WatchHistory />} />
             </Routes>
         </Router>
     );
