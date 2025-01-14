@@ -1,0 +1,16 @@
+version: "3.8"
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - PORT=5000
+      - MONGO_URI=mongodb+srv://finnbar:wUk54NprYsw4caJe@cluster0.ywien.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
