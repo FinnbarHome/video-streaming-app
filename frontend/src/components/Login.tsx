@@ -9,13 +9,12 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // Use your actual API base URL here
-  const API_BASE_URL = 'http://backend:5000/api';
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
   const handleLogin = async () => {
     setError('');
     try {
-      const response = await fetch(`${API_BASE_URL}/login`, {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -43,7 +42,7 @@ const Login: React.FC = () => {
   const handleRegister = async () => {
     setError('');
     try {
-      const response = await fetch(`${API_BASE_URL}/register`, {
+      const response = await fetch(`${API_BASE_URL}/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),

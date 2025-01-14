@@ -68,7 +68,7 @@ app.use((error, req, res, next) => {
 
 // Start server
 if (require.main === module) {
-  const PORT = process.env.PORT || 3000;
+  const PORT = process.env.PORT;
   const server = app.listen(PORT, () => {
     console.log(`API server listening on port ${PORT}!`);
   });

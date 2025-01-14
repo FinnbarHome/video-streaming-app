@@ -10,7 +10,7 @@ interface Video {
   thumbnailUrl: string;
 }
 
-const API_BASE_URL = 'http://backend:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const WatchHistory: React.FC = () => {
   const navigate = useNavigate();
