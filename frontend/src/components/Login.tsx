@@ -10,7 +10,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   // Use your actual API base URL here
-  const API_BASE_URL = '/api/users';
+  const API_BASE_URL = 'http://backend:5000/api';
 
   const handleLogin = async () => {
     setError('');

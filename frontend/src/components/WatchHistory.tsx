@@ -10,7 +10,7 @@ interface Video {
   thumbnailUrl: string;
 }
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://backend:5000/api';
 
 const WatchHistory: React.FC = () => {
   const navigate = useNavigate();

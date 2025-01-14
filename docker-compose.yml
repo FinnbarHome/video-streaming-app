@@ -9,8 +9,9 @@ services:
       - MONGO_URI=mongodb+srv://finnbar:wUk54NprYsw4caJe@cluster0.ywien.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
     ports:
-      - "3000:80"
+      - "8081:8081"  
     depends_on:
       - backend
