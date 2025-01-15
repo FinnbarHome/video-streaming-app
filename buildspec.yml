@@ -28,17 +28,16 @@ phases:
       - echo "Running Prettier for the backend..."
       - npm run format --prefix backend
       - echo "Building Docker images..."
-      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t $PUBLIC_FRONTEND_REPO ./frontend
-      - docker build -t $PUBLIC_BACKEND_REPO ./backend
+      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t public.ecr.aws/r9k7h7m9/frontend-repo:latest ./frontend
+      - docker build -t public.ecr.aws/r9k7h7m9/backend-repo:latest ./backend
 
   post_build:
     commands:
       - echo "Pushing Docker images to ECR Public..."
-      - docker push $PUBLIC_FRONTEND_REPO
-      - docker push $PUBLIC_BACKEND_REPO
+      - docker push public.ecr.aws/r9k7h7m9/frontend-repo:latest
+      - docker push public.ecr.aws/r9k7h7m9/backend-repo:latest
       - echo "Creating imagedefinitions.json..."
-      - printf '[{"name":"FE-container","imageUri":"%s"},{"name":"backend-container","imageUri":"%s"}]' \
-        $PUBLIC_FRONTEND_REPO $PUBLIC_BACKEND_REPO > imagedefinitions.json
+      - printf '[{"name":"FE-container","imageUri":"public.ecr.aws/r9k7h7m9/frontend-repo:latest"},{"name":"backend-container","imageUri":"public.ecr.aws/r9k7h7m9/backend-repo:latest"}]' > imagedefinitions.json
 
 artifacts:
   files:
