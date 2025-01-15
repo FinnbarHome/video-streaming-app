@@ -21,9 +21,7 @@ const WatchHistory: React.FC = () => {
     const fetchHistory = async () => {
       if (!userId) return;
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/users/${userId}/history`
-        );
+        const response = await fetch(`${API_BASE_URL}/users/${userId}/history`);
         const data = await response.json();
         setVideos(data);
       } catch (err) {
@@ -37,12 +35,9 @@ const WatchHistory: React.FC = () => {
   const clearHistory = async () => {
     if (!userId) return;
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/users/${userId}/history`,
-        {
-          method: 'DELETE',
-        }
-      );
+      const response = await fetch(`${API_BASE_URL}/users/${userId}/history`, {
+        method: 'DELETE',
+      });
       const data = await response.json();
       if (!response.ok) {
         console.error('Error clearing history:', data.error);

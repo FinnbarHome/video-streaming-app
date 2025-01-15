@@ -22,7 +22,7 @@ const Watchlist: React.FC = () => {
       if (!userId) return;
       try {
         const response = await fetch(
-          `${API_BASE_URL}/users/${userId}/watchlist`
+          `${API_BASE_URL}/users/${userId}/watchlist`,
         );
         const data = await response.json();
         setVideos(data);
@@ -41,7 +41,7 @@ const Watchlist: React.FC = () => {
         `${API_BASE_URL}/users/${userId}/watchlist/${videoId}`,
         {
           method: 'DELETE',
-        }
+        },
       );
       const data = await response.json();
       if (!response.ok) {

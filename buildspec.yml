@@ -1,20 +1,26 @@
----
 version: 0.2
 
 phases:
   pre_build:
     commands:
+      - echo Checking environment variables...
+      - echo "MONGO_URI: $MONGO_URI"
       - echo Logging in to Docker Hub...
       - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
       - echo Logging in to Amazon ECR Public...
       - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin public.ecr.aws
+      - echo Installing dependencies for frontend and backend...
+      - npm install --prefix frontend
+      - npm install --prefix backend
+
   build:
     commands:
+      - echo Running backend tests...
+      - npm test --prefix backend
       - echo Building Docker images...
-      - |
-        docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL \
-        -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
+      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
       - docker build -t public.ecr.aws/$PUBLIC_BACKEND_REPO ./backend
+
   post_build:
     commands:
       - echo Pushing Docker images to ECR Public...
