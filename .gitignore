@@ -25,3 +25,4 @@ combined.txt
 *.njsproj
 *.sln
 *.sw?
+coverage

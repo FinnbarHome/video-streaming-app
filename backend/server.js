@@ -20,7 +20,7 @@ const app = express();
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 60 minutes
   max: 250, // Limit each IP to 250 requests
-  message: "Too many requests, please try again later.",
+  message: 'Too many requests, please try again later.',
 });
 
 app.use(limiter);
@@ -32,21 +32,21 @@ app.use(morgan('combined'));
 // Initialize Passport
 app.use(passport.initialize());
 
-// Connect to MongoDB Atlas 
+// Connect to MongoDB Atlas
 if (require.main === module) {
   connectDB();
 }
 
 // Routes
 app.get('/', (req, res) => {
-  res.send("Hello World!");
+  res.send('Hello World!');
 });
 
 app.get('/health', async (req, res) => {
   const dbState = mongoose.connection.readyState; // 1 = connected, 0 = disconnected
   res.status(200).json({
-    message: "API is running",
-    database: dbState === 1 ? "connected" : "disconnected",
+    message: 'API is running',
+    database: dbState === 1 ? 'connected' : 'disconnected',
   });
 });
 
@@ -58,12 +58,12 @@ app.use('/api/videos', videoRoutes);
 
 // Error Handling
 app.use((req, res, next) => {
-  res.status(404).json({ error: "Resource not found" });
+  res.status(404).json({ error: 'Resource not found' });
 });
 
 app.use((error, req, res, next) => {
-  console.error("ERROR:", error.stack);
-  res.status(500).json({ error: "Internal Server Error" });
+  console.error('ERROR:', error.stack);
+  res.status(500).json({ error: 'Internal Server Error' });
 });
 
 // Start server

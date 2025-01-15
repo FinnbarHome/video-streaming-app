@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+RUN npm install --no-cache --production=false
 
 # Copy the rest of the application files
 COPY . .
@@ -32,7 +32,7 @@ COPY --from=build /app/server.js ./server.js
 COPY --from=build /app/package*.json ./
 
 # Install only production dependencies
-RUN npm install --production
+RUN npm install --production --no-cache
 
 # Expose the frontend port
 EXPOSE 8081

@@ -8,7 +8,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm install --production
+RUN npm install --production --no-cache
 
 # Copy the rest of the application files
 COPY . .
@@ -16,7 +16,7 @@ COPY . .
 # Expose the backend port
 EXPOSE 5000
 
-# Use environment variables for configuration 
+# Use environment variables for configuration
 ENV NODE_ENV=production
 
 # Start the backend server
