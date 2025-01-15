@@ -1,0 +1,246 @@
+.dashboard {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #141414;
+    color: #fff;
+    width: 100%; 
+  }
+.slick-prev::before,
+.slick-next::before {
+  color: #fff; 
+  font-size: 2rem;
+}
+
+.slick-dots li button:before {
+  font-size: 0.75rem;
+  color: #fff;
+}
+.slick-dots li.slick-active button:before {
+  color: #e50914;
+}
+
+/* Navbar Section */
+.navbar {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #000;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.navbarLeft {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e50914;
+    margin-right: 20px;
+}
+
+.navLinks {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+}
+
+.navLinks li {
+    font-size: 1rem;
+}
+
+.navLinks a {
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.navLinks a:hover {
+    color: #e50914;
+}
+
+.navbarRight {
+    display: flex;
+    align-items: center;
+}
+
+.searchInput {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    font-size: 1rem;
+    background-color: #333;
+    color: #fff;
+    outline: none;
+    transition: background-color 0.3s;
+    width: 200px;
+}
+
+.searchInput::placeholder {
+    color: #aaa;
+}
+
+.searchInput:focus {
+    background-color: #444;
+}
+
+/* Content Section */
+.content {
+    text-align: center;
+    margin: 50px 0;
+}
+
+.content h2 {
+    font-size: 2rem;
+}
+
+.content p {
+    font-size: 1.2rem;
+    margin-top: 10px;
+    color: #ccc;
+}
+
+/* Carousel Section */
+.carousel {
+    width: 95%;
+    margin-top: 50px;
+    margin: 50px auto;
+    position: relative; 
+}
+
+.carouselContainer {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+}
+
+.carouselTrack {
+    display: flex;
+    transition: transform 0.5s ease;
+    will-change: transform; 
+}
+
+.carouselItem {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 10px;
+    background-color: #222;
+    margin: 0 5px;
+  }
+  
+
+.carouselItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Carousel arrows */
+.carouselArrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 50px;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    z-index: 10;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.carouselArrow.left {
+    left: 10px;
+}
+
+.carouselArrow.right {
+    right: 10px;
+}
+
+.carouselArrow:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+@media (max-width: 1200px) {
+    .carouselItem {
+        flex: 0 0 calc(100% / 2); 
+        max-width: calc(100% / 2);
+    }
+}
+
+@media (max-width: 768px) {
+    .carouselItem {
+        flex: 0 0 100%; 
+        max-width: 100%;
+    }
+}
+
+/* Grid Section */
+.grid {
+    width: 100%;
+    margin-top: 50px;
+    text-align: center;
+}
+
+.gridContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(calc(16 / 9 * 200px), 1fr));
+    gap: 10px;
+    padding: 0 10px;
+}
+
+.gridItem {
+    width: 100%;
+    aspect-ratio: 16 / 9; 
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease;
+}
+
+.gridItem img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gridItem:hover {
+    transform: scale(1.05);
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999; 
+}
+  
+.modalContent {
+    background-color: #222;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 500px;
+    color: #fff;
+    text-align: center;
+}
