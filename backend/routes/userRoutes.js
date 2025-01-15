@@ -57,7 +57,9 @@ router.post('/login', (req, res, next) => {
       return res.status(500).json({ error: 'Internal server error' });
     }
     if (!user) {
-      return res.status(401).json({ error: info?.message || 'Invalid credentials' });
+      return res
+        .status(401)
+        .json({ error: info?.message || 'Invalid credentials' });
     }
 
     const payload = {
@@ -133,7 +135,7 @@ router.get('/:userId/watchlist', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const videos = user.watchlist.map(item => item.videoId);
+    const videos = user.watchlist.map((item) => item.videoId);
     return res.status(200).json(videos);
   } catch (err) {
     console.error('Get Watchlist Error:', err);
@@ -158,7 +160,7 @@ router.get('/:userId/history', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const videos = user.watchHistory.map(item => item.videoId);
+    const videos = user.watchHistory.map((item) => item.videoId);
     return res.status(200).json(videos);
   } catch (err) {
     console.error('Get History Error:', err);
@@ -188,7 +190,9 @@ router.delete('/:userId/watchlist/:videoId', async (req, res) => {
     );
 
     await user.save();
-    return res.status(200).json({ message: 'Video removed from watchlist', user });
+    return res
+      .status(200)
+      .json({ message: 'Video removed from watchlist', user });
   } catch (err) {
     console.error('Remove from Watchlist Error:', err);
     return res.status(500).json({ error: 'Internal server error' });

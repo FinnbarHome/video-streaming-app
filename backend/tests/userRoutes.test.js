@@ -1,6 +1,6 @@
 const request = require('supertest');
 const mongoose = require('mongoose');
-const app = require('../server'); 
+const app = require('../server');
 require('dotenv').config();
 
 const validUserId = '67880b05ada218caccc013bc'; // Replace with an actual user ID from your database
@@ -18,14 +18,16 @@ describe('User GET Routes', () => {
   });
 
   describe('GET /api/users/:userId/watchlist', () => {
-    it('should return the user\'s watchlist', async () => {
+    it("should return the user's watchlist", async () => {
       const res = await request(app).get(`/api/users/${validUserId}/watchlist`);
       expect(res.statusCode).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
     });
 
     it('should return 404 if user does not exist', async () => {
-      const res = await request(app).get(`/api/users/${invalidUserId}/watchlist`);
+      const res = await request(app).get(
+        `/api/users/${invalidUserId}/watchlist`
+      );
       expect(res.statusCode).toBe(404);
       expect(res.body).toHaveProperty('error', 'User not found');
     });
@@ -38,7 +40,7 @@ describe('User GET Routes', () => {
   });
 
   describe('GET /api/users/:userId/history', () => {
-    it('should return the user\'s watch history', async () => {
+    it("should return the user's watch history", async () => {
       const res = await request(app).get(`/api/users/${validUserId}/history`);
       expect(res.statusCode).toBe(200);
       expect(Array.isArray(res.body)).toBe(true);
