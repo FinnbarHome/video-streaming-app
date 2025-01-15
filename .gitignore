@@ -25,3 +25,5 @@ combined.txt
 *.njsproj
 *.sln
 *.sw?
+.env
+coverage
