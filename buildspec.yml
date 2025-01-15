@@ -1,20 +1,20 @@
 ---
 version: 0.2
-
 phases:
   pre_build:
     commands:
       - echo "Checking environment variables..."
       - echo "MONGO_URI and VITE_API_BASE_URL are set."
-      - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
-      - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin public.ecr.aws
+      - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME
+        --password-stdin
+      - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker
+        login --username AWS --password-stdin public.ecr.aws
       - echo "Installing dependencies for frontend and backend..."
       - npm ci --prefix frontend
       - npm ci --prefix backend
       - echo "Auditing dependencies for vulnerabilities..."
       - npm audit --prefix frontend || true
       - npm audit --prefix backend || true
-
   build:
     commands:
       - echo "Running Prettier for frontend..."
@@ -32,22 +32,20 @@ phases:
         docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL \
         -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
       - docker build -t public.ecr.aws/$PUBLIC_BACKEND_REPO ./backend
-
   post_build:
     commands:
       - echo "Pushing Docker images to ECR Public..."
       - docker push $PUBLIC_FRONTEND_REPO
       - docker push $PUBLIC_BACKEND_REPO
       - echo "Creating imagedefinitions.json..."
-      - printf '[{"name":"FE-container","imageUri":"%s"},{"name":"backend-container","imageUri":"%s"}]' \
-        $PUBLIC_FRONTEND_REPO $PUBLIC_BACKEND_REPO > imagedefinitions.json
-
+      - printf
+        '[{"name":"FE-container","imageUri":"%s"},{"name":"backend-container","imageUri":"%s"}]'
+        \ $PUBLIC_FRONTEND_REPO $PUBLIC_BACKEND_REPO > imagedefinitions.json
 artifacts:
   files:
     - imagedefinitions.json
-
 cache:
   paths:
-    - "/root/.npm"
-    - "frontend/node_modules"
-    - "backend/node_modules"
+    - /root/.npm
+    - frontend/node_modules
+    - backend/node_modules
