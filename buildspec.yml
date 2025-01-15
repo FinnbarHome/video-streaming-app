@@ -20,7 +20,7 @@ phases:
       - docker push public.ecr.aws/$PUBLIC_BACKEND_REPO
       - |
         echo Creating imagedefinitions.json file...
-        printf '[{"name":"frontend-service","imageUri":"public.ecr.aws/%s"},{"name":"backend-service","imageUri":"public.ecr.aws/%s"}]' \
+        printf '[{"name":"FE-container","imageUri":"public.ecr.aws/%s"},{"name":"backend-container","imageUri":"public.ecr.aws/%s"}]' \
         $PUBLIC_FRONTEND_REPO $PUBLIC_BACKEND_REPO > imagedefinitions.json
 
 artifacts:
