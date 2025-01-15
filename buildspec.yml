@@ -10,6 +10,9 @@ phases:
       - echo "Installing dependencies for frontend and backend..."
       - npm ci --prefix frontend
       - npm ci --prefix backend
+      - echo "Auditing dependencies for vulnerabilities..."
+      - npm audit --prefix frontend || true
+      - npm audit --prefix backend || true
 
   build:
     commands:
