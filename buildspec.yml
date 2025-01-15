@@ -1,3 +1,4 @@
+---
 version: 0.2
 
 phases:
@@ -10,6 +11,10 @@ phases:
       - echo "Installing dependencies for frontend and backend..."
       - npm ci --prefix frontend
       - npm ci --prefix backend
+      - echo "Running ESLint for the backend..."
+      - npm run lint --prefix backend
+      - echo "Running Prettier for the backend..."
+      - npm run format --prefix backend
       - echo "Auditing dependencies for vulnerabilities..."
       - npm audit --prefix frontend || true
       - npm audit --prefix backend || true
