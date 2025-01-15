@@ -1,8 +1,7 @@
-buildspec.yml:
 ---
 version: 0.2
 
-phases:
+phases:W
   pre_build:
     commands:
       - echo "Checking environment variables..."
