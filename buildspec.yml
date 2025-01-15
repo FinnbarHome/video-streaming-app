@@ -11,7 +11,6 @@ phases:
       - echo "Installing dependencies for frontend and backend..."
       - npm ci --prefix frontend
       - npm ci --prefix backend
-
       - echo "Auditing dependencies for vulnerabilities..."
       - npm audit --prefix frontend || true
       - npm audit --prefix backend || true
@@ -20,9 +19,9 @@ phases:
     commands:
       - echo "Running Prettier for frontend..."
       - npx prettier --write "frontend/src/**/*.{ts,tsx}"
-      - echo "Running linting tests for the frontend...""
+      - echo "Running linting tests for the frontend..."
       - npm run lint --prefix frontend
-      - echo "Running backend tests...
+      - echo "Running backend tests..."
       - npm test --prefix backend
       - echo "Running ESLint for the backend..."
       - npm run lint --prefix backend
