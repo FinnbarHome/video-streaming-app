@@ -1,20 +1,25 @@
 phases:
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker login --username $USERNAME --password-stdin $PASSWORD
+      - echo Logging in to Amazon ECR Public...
+      - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin public.ecr.aws
   build:
     commands:
       - echo Building Docker images...
-      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t $FRONTEND_ECR ./frontend
-      - docker build -t $BACKEND_ECR ./backend
+      - |
+        docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL \
+        -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
+      - docker build -t public.ecr.aws/$PUBLIC_BACKEND_REPO ./backend
   post_build:
     commands:
-      - echo Pushing Docker images...
-      - docker push $FRONTEND_ECR
-      - docker push $BACKEND_ECR
-      - echo Creating build artifacts...
-      - printf '{"frontend-image": "%s", "backend-image": "%s"}' $FRONTEND_ECR $BACKEND_ECR > build.json
+      - echo Pushing Docker images to ECR Public...
+      - docker push public.ecr.aws/$PUBLIC_FRONTEND_REPO
+      - docker push public.ecr.aws/$PUBLIC_BACKEND_REPO
+      - |
+        echo Creating build artifacts...
+        printf '{"frontend-image": "%s", "backend-image": "%s"}' \
+        public.ecr.aws/$PUBLIC_FRONTEND_REPO public.ecr.aws/$PUBLIC_BACKEND_REPO > build.json
+
 artifacts:
   files:
     - build.json
