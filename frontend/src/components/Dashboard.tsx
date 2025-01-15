@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import styles from './Dashboard.module.css';
 
 interface Video {
@@ -65,11 +65,14 @@ const Dashboard: React.FC = () => {
   const handleAddToWatchlist = async () => {
     if (!selectedVideo || !userId) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/watchlist`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ videoId: selectedVideo._id }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/users/${userId}/watchlist`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ videoId: selectedVideo._id }),
+        },
+      );
       const data = await response.json();
       if (!response.ok) {
         console.error('Error adding to watchlist:', data.error);
@@ -89,7 +92,7 @@ const Dashboard: React.FC = () => {
     }
     try {
       const response = await fetch(
-        `${API_BASE_URL}/videos/search?query=${encodeURIComponent(searchTerm)}`
+        `${API_BASE_URL}/videos/search?query=${encodeURIComponent(searchTerm)}`,
       );
       const data = await response.json();
       setSearchResults(data);
@@ -114,8 +117,8 @@ const Dashboard: React.FC = () => {
     slidesToScroll: 1,
     responsive: [
       { breakpoint: 1200, settings: { slidesToShow: 3 } },
-      { breakpoint: 768,  settings: { slidesToShow: 2 } },
-      { breakpoint: 480,  settings: { slidesToShow: 1 } },
+      { breakpoint: 768, settings: { slidesToShow: 2 } },
+      { breakpoint: 480, settings: { slidesToShow: 1 } },
     ],
   };
 
@@ -160,7 +163,9 @@ const Dashboard: React.FC = () => {
           {/* SEARCH RESULTS VIEW */}
           <div className={styles.content}>
             <h2>Search Results</h2>
-            <p>Found {searchResults.length} videos for: <b>{searchTerm}</b></p>
+            <p>
+              Found {searchResults.length} videos for: <b>{searchTerm}</b>
+            </p>
           </div>
           <div className={styles.grid}>
             <div className={styles.gridContainer}>

@@ -21,7 +21,7 @@ const Login: React.FC = () => {
         body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
-  
+
       if (!response.ok) {
         setError(data.error || 'Login failed. Please try again.');
       } else {
@@ -56,7 +56,7 @@ const Login: React.FC = () => {
         // Store userId in localStorage
         localStorage.setItem('userId', data.userId);
         localStorage.setItem('username', data.username);
-  
+
         // navigate to dashboard
         navigate('/dashboard');
       }
@@ -78,7 +78,9 @@ const Login: React.FC = () => {
   return (
     <div className={styles.loginBackground}>
       <div className={styles.loginContainer}>
-        <h1 className={styles.loginTitle}>{isRegisterMode ? 'Register' : 'Login'}</h1>
+        <h1 className={styles.loginTitle}>
+          {isRegisterMode ? 'Register' : 'Login'}
+        </h1>
         <form onSubmit={handleSubmit}>
           <input
             type="text"
