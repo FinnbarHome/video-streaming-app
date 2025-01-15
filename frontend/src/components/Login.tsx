@@ -10,6 +10,7 @@ const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+  console.log(`Api base url is set as: ${API_BASE_URL}`);
 
   const handleLogin = async () => {
     setError('');
