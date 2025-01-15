@@ -7,8 +7,10 @@ phases:
       - echo "MONGO_URI and VITE_API_BASE_URL are set."
       - echo "PUBLIC_FRONTEND_REPO: $PUBLIC_FRONTEND_REPO"
       - echo "PUBLIC_BACKEND_REPO: $PUBLIC_BACKEND_REPO"
-      - export PUBLIC_FRONTEND_REPO=$(echo $PUBLIC_FRONTEND_REPO | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-_' '-')
-      - export PUBLIC_BACKEND_REPO=$(echo $PUBLIC_BACKEND_REPO | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-_' '-')
+      - |
+        export PUBLIC_FRONTEND_REPO=$(echo $PUBLIC_FRONTEND_REPO | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-_' '-')
+      - |
+        export PUBLIC_BACKEND_REPO=$(echo $PUBLIC_BACKEND_REPO | tr '[:upper:]' '[:lower:]' | tr -c 'a-z0-9-_' '-')
       - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
       - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin public.ecr.aws
       - echo "Installing dependencies for frontend and backend..."
@@ -24,15 +26,20 @@ phases:
   build:
     commands:
       - echo "Building frontend and backend Docker images..."
-      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
-      - docker build -t public.ecr.aws/$PUBLIC_BACKEND_REPO ./backend
+      - |
+        docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL \
+        -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
+      - |
+        docker build -t public.ecr.aws/$PUBLIC_BACKEND_REPO ./backend
   post_build:
     commands:
       - echo "Pushing Docker images to ECR Public..."
       - docker push public.ecr.aws/$PUBLIC_FRONTEND_REPO
       - docker push public.ecr.aws/$PUBLIC_BACKEND_REPO
       - echo "Creating imagedefinitions.json..."
-      - printf '[{"name":"FE-container","imageUri":"public.ecr.aws/%s"},{"name":"backend-container","imageUri":"public.ecr.aws/%s"}]' $PUBLIC_FRONTEND_REPO $PUBLIC_BACKEND_REPO > imagedefinitions.json
+      - |
+        printf '[{"name":"FE-container","imageUri":"public.ecr.aws/%s"},{"name":"backend-container","imageUri":"public.ecr.aws/%s"}]' \
+        $PUBLIC_FRONTEND_REPO $PUBLIC_BACKEND_REPO > imagedefinitions.json
 artifacts:
   files:
     - imagedefinitions.json
