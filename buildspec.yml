@@ -22,8 +22,8 @@ phases:
   build:
     commands:
       - echo "Building frontend and backend Docker images..."
-      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
-      - docker build -t public.ecr.aws/$PUBLIC_BACKEND_REPO ./backend
+      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t $PUBLIC_FRONTEND_REPO ./frontend
+      - docker build -t $PUBLIC_BACKEND_REPO ./backend
 
   post_build:
     commands:
