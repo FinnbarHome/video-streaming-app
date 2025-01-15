@@ -1,5 +1,5 @@
 # Build stage
-FROM node:23-alpine AS build
+FROM node:20-alpine AS build
 
 # Set working directory
 WORKDIR /app
@@ -21,7 +21,7 @@ ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
 # Serve stage
-FROM node:23-alpine
+FROM node:20-alpine
 
 # Set working directory
 WORKDIR /app
