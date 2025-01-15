@@ -35,7 +35,7 @@ phases:
       - docker push public.ecr.aws/r9k7h7m9/frontend-repo:latest
       - docker push public.ecr.aws/r9k7h7m9/backend-repo:latest
       - echo "Creating imagedefinitions.json..."
-      - printf '[{"name":"FE-container","imageUri":"public.ecr.aws/r9k7h7m9/frontend-repo:latest"},{"name":"backend-container-2","imageUri":"public.ecr.aws/r9k7h7m9/backend-repo:latest"}]' > imagedefinitions.json
+      - printf '[{"name":"FE-container","imageUri":"public.ecr.aws/r9k7h7m9/frontend-repo:latest"},{"name":"backend-container","imageUri":"public.ecr.aws/r9k7h7m9/backend-repo:latest"}]' > imagedefinitions.json
 
 artifacts:
   files:
