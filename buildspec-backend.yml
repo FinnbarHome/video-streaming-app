@@ -1,0 +1,47 @@
+---
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to Docker (DockerHub) and ECR Public..."
+      - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
+      - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin public.ecr.aws
+
+      - echo "Installing dependencies for the backend..."
+      - npm ci --prefix backend
+
+      - echo "Auditing backend dependencies for vulnerabilities..."
+      - npm audit --prefix backend || true
+
+  build:
+    commands:
+      - echo "Running backend tests with Jest and Supertest..."
+      - npm test --prefix backend
+
+      - echo "Running ESLint for the backend..."
+      - npm run lint --prefix backend
+
+      - echo "Running Prettier for the backend..."
+      - npm run format --prefix backend
+
+      - echo "Building Docker image for the backend..."
+      - docker build -t public.ecr.aws/r9k7h7m9/backend-repo:latest ./backend
+
+  post_build:
+    commands:
+      - echo "Pushing the Docker image for the backend to ECR Public..."
+      - docker push public.ecr.aws/r9k7h7m9/backend-repo:latest
+
+      - echo "Creating imagedefinitions.json for the backend..."
+      - printf '[{"name":"backend-container","imageUri":"public.ecr.aws/r9k7h7m9/backend-repo:latest"}]' \
+        > imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json
+
+cache:
+  paths:
+    - /root/.npm
+    - backend/node_modules
