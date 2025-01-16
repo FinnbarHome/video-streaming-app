@@ -16,6 +16,10 @@ const videoRoutes = require('./routes/videoRoutes');
 // Initialize Express app
 const app = express();
 
+
+console.log('Hi Mike Crabb!!!!!');
+
+
 // Middleware
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 60 minutes
@@ -28,6 +32,7 @@ app.use(cors());
 app.use(express.json());
 app.use(compression());
 app.use(morgan('combined'));
+
 
 // Initialize Passport
 app.use(passport.initialize());
