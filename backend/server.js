@@ -16,10 +16,6 @@ const videoRoutes = require('./routes/videoRoutes');
 // Initialize Express app
 const app = express();
 
-
-console.log('Hi Mike Crabb!!!!!');
-
-
 // Middleware
 const limiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 60 minutes
