@@ -29,6 +29,9 @@ app.use(express.json());
 app.use(compression());
 app.use(morgan('combined'));
 
+
+console.log('Hi Mike Crabb');
+
 // Initialize Passport
 app.use(passport.initialize());
 
