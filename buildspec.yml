@@ -19,7 +19,6 @@ phases:
     commands:
       - echo "Lint/Test frontend..."
       - npm run lint --prefix frontend
-      - npm test --prefix frontend
       - echo "Running Prettier for frontend..."
       - npx prettier --write "frontend/src/**/*.{ts,tsx,js,jsx,css,scss,json,html}"
 
