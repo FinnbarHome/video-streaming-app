@@ -29,4 +29,7 @@ coverage
 
 *.mp4
 *.png
+
+# Generated env files
 generated.env
+db-seeder/.env
