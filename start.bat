@@ -26,7 +26,6 @@ echo Using SEED_API_BASE_URL=%SEED_API_BASE_URL%
 cd db-seeder
 
 :: Install dependencies
-echo Installing dependencies...
 call npm install
 IF %ERRORLEVEL% NEQ 0 (
     echo Failed to install dependencies. Aborting seeder script.

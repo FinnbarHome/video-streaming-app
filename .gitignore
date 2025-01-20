@@ -26,3 +26,7 @@ combined.txt
 *.sln
 *.sw?
 coverage
+
+*.mp4
+*.png
+env.txt

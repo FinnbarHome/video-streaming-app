@@ -13,6 +13,8 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
+console.log("Connecting to MongoDB with URI:", MONGO_URI);
+
 // API Base URL from .env
 const apiBaseUrl = process.env.SEED_API_BASE_URL;
 if (!apiBaseUrl) {
