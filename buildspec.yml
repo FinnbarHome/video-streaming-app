@@ -29,23 +29,23 @@ phases:
       - npm run format --prefix backend
 
       - echo "Building both images..."
-      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t public.ecr.aws/r9k7h7m9/frontend-repo:latest ./frontend
-      - docker build -t public.ecr.aws/r9k7h7m9/backend-repo:latest ./backend
+      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t $FRONTEND_REPO ./frontend
+      - docker build -t $BACKEND_REPO ./backend
 
   post_build:
     commands:
       - echo "Pushing both images to ECR Public..."
-      - docker push public.ecr.aws/r9k7h7m9/frontend-repo:latest
-      - docker push public.ecr.aws/r9k7h7m9/backend-repo:latest
+      - docker push $FRONTEND_REPO
+      - docker push $BACKEND_REPO
 
       - echo "Creating two image definition files..."
 
       # 1) imagedefinitions-frontend.json
-      - printf '[{"name":"FE-container","imageUri":"public.ecr.aws/r9k7h7m9/frontend-repo:latest"}]' \
+      - printf '[{"name":"FE-container","imageUri":"$FRONTEND_REPO"}]' \
         > imagedefinitions-frontend.json
 
       # 2) imagedefinitions-backend.json
-      - printf '[{"name":"backend-container","imageUri":"public.ecr.aws/r9k7h7m9/backend-repo:latest"}]' \
+      - printf '[{"name":"backend-container","imageUri":"$BACKEND_REPO"}]' \
         > imagedefinitions-backend.json
 
 artifacts:

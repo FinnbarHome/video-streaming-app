@@ -7,7 +7,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - MONGO_URI=mongodb+srv://finnbar:wUk54NprYsw4caJe@cluster0.ywien.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      - MONGO_URI=[Insert your mongo URI here]
       - PORT=5000
 
   frontend:
