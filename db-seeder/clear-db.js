@@ -22,7 +22,7 @@ const clearDatabase = async () => {
 
     console.log("Connected to the database.");
 
-    // Specify the collection to clear
+    // Specify the video collection to clear
     const collection = mongoose.connection.db.collection("videos");
 
     // Count documents in the collection

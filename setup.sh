@@ -9,9 +9,6 @@ rm -rf generated.env
 # Remove the db-seeder generated .env file if it exists
 rm -rf db-seeder/.env
 
-# Remove the clear-db generated .env file if it exists
-rm -rf clear-db/.env
-
 # Define the path to the original .env file
 ORIGINAL_ENV_FILE=".env"
 
@@ -84,6 +81,10 @@ cd db-seeder || exit
 
 # Install dependencies
 npm install
+
+# Run the clear-db.js script to clear existing entries
+echo "Clearing the database if entries exist..."
+node clear-db.js
 
 # Run the seed script
 node seed.js
