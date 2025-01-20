@@ -13,19 +13,22 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-console.log("Connecting to MongoDB with URI:", MONGO_URI);
-
 // API Base URL from .env
-const apiBaseUrl = process.env.SEED_API_BASE_URL;
+const VIDEO_HOST_PORT = process.env.VIDEO_HOST_PORT;
+const apiBaseUrl = `http://localhost:${VIDEO_HOST_PORT}/videos`;
+
 if (!apiBaseUrl) {
   console.error("API_BASE_URL is not defined in the .env file");
   process.exit(1);
 }
 
+console.log(`Connecting to MongoDB: ${MONGO_URI}`);
+console.log(`Using Video Host Port: ${VIDEO_HOST_PORT}`);
+
 // Connect to MongoDB
 mongoose
   .connect(MONGO_URI)
-  .then(() => console.log("Connected to MongoDB (test database)"))
+  .then(() => console.log("Connected to MongoDB"))
   .catch((err) => {
     console.error("MongoDB connection error:", err);
     process.exit(1);
