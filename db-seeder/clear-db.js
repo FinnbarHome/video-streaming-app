@@ -15,10 +15,7 @@ if (!MONGO_URI) {
 const clearDatabase = async () => {
   try {
     // Connect to the database
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(MONGO_URI);
 
     console.log("Connected to the database.");
 
