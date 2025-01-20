@@ -13,9 +13,11 @@ RUN npm install --no-cache --production=false
 # Copy the rest of the application files
 COPY . .
 
-# Accept build arguments for Vite environment variables
+# Accept build arguments for Vite environment variables and port
 ARG VITE_API_BASE_URL
+ARG PORT=8081
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
+ENV PORT=$PORT
 
 # Build the Vite app
 RUN npm run build
@@ -34,8 +36,8 @@ COPY --from=build /app/package*.json ./
 # Install only production dependencies
 RUN npm install --production --no-cache
 
-# Expose the frontend port
-EXPOSE 8081
+# Expose the frontend port dynamically
+EXPOSE $PORT
 
 # Start the server
 CMD ["node", "server.js"]

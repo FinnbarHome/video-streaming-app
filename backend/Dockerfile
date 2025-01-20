@@ -13,8 +13,12 @@ RUN npm install --production --no-cache
 # Copy the rest of the application files
 COPY . .
 
-# Expose the backend port
-EXPOSE 5000
+# Accept port as a build argument
+ARG PORT=5000
+ENV PORT=$PORT
+
+# Expose the backend port dynamically
+EXPOSE $PORT
 
 # Use environment variables for configuration
 ENV NODE_ENV=production
