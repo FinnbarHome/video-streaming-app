@@ -2,13 +2,15 @@
 
 ## Overview
 
-This is a locally deployable video streaming platform designed to offer seamless browsing, streaming, and video management. Initially hosted on AWS, the project now requires Docker and MongoDB for local deployment. Key features include:
+This is a locally deployable video streaming platform designed to offer seamless browsing, streaming, and video management. Key features include:
 
 - **User Authentication:** Secure login and registration.
 - **Video Streaming:** High-quality playback.
 - **Watch History:** Tracks previously viewed videos.
 - **Watchlist Management:** Save videos for later.
 - **Search Functionality:** Search videos by keywords.
+
+The project was originally designed to run on AWS but has been enhanced to include new content and containers such as the `db-seeder` and `video-host`, enabling the platform to run locally using Docker.
 
 ## Architecture
 
@@ -19,7 +21,7 @@ The platform is built using:
 - **Database:** MongoDB
 - **Containerization:** Docker Compose
 
-## Former AWS Hosting
+### Former AWS Hosting
 
 Previously, the platform was hosted on AWS with the following architecture:
 
@@ -29,7 +31,9 @@ Previously, the platform was hosted on AWS with the following architecture:
 - **AWS Elastic Load Balancer:** Routed traffic between frontend and backend services.
 - **AWS ECR:** Stored Docker images for containerized services.
 
-The deployment also included a CI/CD pipeline implemented using AWS CodePipeline and AWS CodeBuild, which automated builds and deployments for both frontend and backend services. The current setup replicates the functionality locally using Docker.
+The deployment also included a CI/CD pipeline implemented using AWS CodePipeline and AWS CodeBuild, which automated builds and deployments for both frontend and backend services.
+
+Now, additional content and containers like `db-seeder` and `video-host` have been added, allowing the platform to run entirely locally without AWS dependencies.
 
 ## Prerequisites
 
@@ -37,7 +41,22 @@ To run this project, ensure the following are installed:
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [MongoDB](https://www.mongodb.com/try/download/community)
+- [MongoDB](https://www.mongodb.com/try/download/community) (for local MongoDB deployment, or use MongoDB Atlas)
+- [Git Bash](https://git-scm.com/) (if you’re using Windows)
+- [Node.js](https://nodejs.org/en/)
+
+### MongoDB Connection
+
+You can use either:
+
+- A locally hosted MongoDB connection string, such as:
+  ```plaintext
+  mongodb://localhost:27017
+  ```
+- A MongoDB Atlas connection string in the format:
+  ```plaintext
+  mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+  ```
 
 ## Project Setup
 
@@ -46,58 +65,62 @@ To run this project, ensure the following are installed:
 Clone the repository to your local machine:
 
 ```bash
-git https://github.com/FinnbarHome/video-streaming-app.git
+git clone https://github.com/FinnbarHome/video-streaming-app.git
 cd video-streaming-platform
 ```
 
-### 2. Restore MongoDB Data
+### 2. Configure Environment Variables
 
-Import the provided MongoDB dump into your MongoDB instance:
+Create a `.env` file in the root directory and add the following variables:
 
-```bash
-mongorestore --uri="mongodb://<your-mongo-uri>" /path/to/your/mongodb/dump
+```env
+MONGO_URI=mongodb://localhost:27017
+BACKEND_PORT=5000
+JWT_SECRET=your_secret_key
+VITE_API_BASE_URL=http://localhost:5000/api
+FRONTEND_PORT=8081
+VIDEO_HOST_PORT=3000
 ```
 
-Replace `<your-mongo-uri>` with your MongoDB URI and `/path/to/your/mongodb/dump` with the path to your MongoDB dump folder.
+- Replace `MONGO_URI` with your MongoDB connection string if different (e.g., a MongoDB Atlas URI).
+- Set a secure value for `JWT_SECRET`.
 
-### 3. Set Up Environment Variables
+### 3. Add Videos
 
-Update the `docker-compose.yml` file:
+To add videos to the platform:
 
-- Replace `[Insert your mongo URI here]` in the `backend` service with your MongoDB URI.
+1. Place your video files in the `video-host/videos` directory.
+2. Ensure each video has a corresponding thumbnail image:
+   - **Format Requirements**:
+     - Videos: `.mp4`
+     - Thumbnails: `.png`
+   - **Naming Convention**:
+     - Video and thumbnail must share the same name (case-sensitive).
+     - Example:
+       - `VideoOfDog.mp4`
+       - `VideoOfDog.png`
 
-Example:
-
-```yaml
-backend:
-  environment:
-    - MONGO_URI=mongodb://localhost:27017/videostreaming
-```
+The `db-seeder` container automatically processes these files, extracting metadata and adding them to the database when the platform starts.
 
 ### 4. Run the Application
 
-Run the Docker Compose file to start the services:
+To start the application, run the provided shell script:
 
 ```bash
-docker-compose up --build
+./setup.sh
 ```
 
-This will:
+#### What the Script Does:
 
-- Build and start the `backend` service on port `5000`.
-- Build and start the `frontend` service on port `8081`.
+1. Validates the `.env` file to ensure all required variables are set.
+2. Clears existing entries in the database if any exist.
+3. Seeds the database with video metadata from the `video-host/videos` directory.
+4. Starts the application using Docker Compose.
 
 ### 5. Access the Application
 
 - **Frontend:** Open [http://localhost:8081](http://localhost:8081) in your browser.
 - **Backend API:** Accessible at [http://localhost:5000/api](http://localhost:5000/api).
-
-## CI/CD Pipeline (Optional)
-
-The project includes a `buildspec.yml` file for setting up a CI/CD pipeline. To use it:
-
-1. Configure AWS CodePipeline and CodeBuild.
-2. Push changes to your repository to trigger builds and deployments.
 
 ## Features
 
@@ -106,8 +129,29 @@ The project includes a `buildspec.yml` file for setting up a CI/CD pipeline. To 
 - **Watch History:** Tracks viewed videos for each user.
 - **Watchlist Management:** Save and manage videos for future viewing.
 - **Search Functionality:** Fast and accurate video search.
+- **Custom Video Uploads:** Easily add new videos and thumbnails for streaming.
 
 ## Troubleshooting
 
-- **MongoDB Connection Issues:** Ensure your MongoDB instance is running and the URI is correct.
-- **Port Conflicts:** Check if ports `5000` or `8081` are already in use. If so, update them in `docker-compose.yml`.
+### Common Issues
+
+- **MongoDB Connection Issues:**
+  - Ensure your MongoDB instance is running.
+  - Check the `MONGO_URI` value in your `.env` file. If using Atlas, ensure credentials are correct.
+- **Port Conflicts:**
+  - Verify that the ports `5000`, `8081`, and `3000` are not in use. If needed, update them in the `.env` file and `docker-compose.yml`.
+- **Permission Issues:**
+  - On Windows, ensure you’re using Git Bash or WSL for proper shell script execution.
+
+### Logs
+
+- Database scripts (`clear-db.js`, `seed.js`) log the number of entries cleared or added for better visibility.
+
+---
+
+### Former CI/CD Pipeline (Optional)
+
+The project includes a `buildspec.yml` file for setting up a CI/CD pipeline. To use it:
+
+1. Configure AWS CodePipeline and CodeBuild.
+2. Push changes to your repository to trigger builds and deployments.
