@@ -9,6 +9,9 @@ rm -rf generated.env
 # Remove the db-seeder generated .env file if it exists
 rm -rf db-seeder/.env
 
+# Stop and remove any existing Docker containers
+docker-compose down
+
 # Define the path to the original .env file
 ORIGINAL_ENV_FILE=".env"
 
