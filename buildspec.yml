@@ -4,42 +4,57 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo "Checking environment variables..."
-      - echo "MONGO_URI and VITE_API_BASE_URL are set."
       - echo $DOCKER_PASSWORD | docker login --username $DOCKER_USERNAME --password-stdin
       - aws ecr-public get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin public.ecr.aws
+
       - echo "Installing dependencies for frontend and backend..."
       - npm ci --prefix frontend
       - npm ci --prefix backend
-      - echo "Running ESLint for the backend..."
-      - npm run lint --prefix backend
-      - echo "Running Prettier for the backend..."
-      - npm run format --prefix backend
+
       - echo "Auditing dependencies for vulnerabilities..."
       - npm audit --prefix frontend || true
       - npm audit --prefix backend || true
 
   build:
     commands:
-      - echo "Building frontend and backend Docker images..."
-      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t public.ecr.aws/$PUBLIC_FRONTEND_REPO ./frontend
-      - docker build -t public.ecr.aws/$PUBLIC_BACKEND_REPO ./backend
+      - echo "Lint/Test frontend..."
+      - npm run lint --prefix frontend
+      - echo "Running Prettier for frontend..."
+      - npx prettier --write "frontend/src/**/*.{ts,tsx,js,jsx,css,scss,json,html}"
+
+      - echo "Lint/Test backend..."
+      - npm run lint --prefix backend
+      - npm test --prefix backend
+      - echo "Running Prettier for the backend..."
+      - npm run format --prefix backend
+
+      - echo "Building both images..."
+      - docker build --build-arg VITE_API_BASE_URL=$VITE_API_BASE_URL -t $FRONTEND_REPO ./frontend
+      - docker build -t $BACKEND_REPO ./backend
 
   post_build:
     commands:
-      - echo "Pushing Docker images to ECR Public..."
-      - docker push public.ecr.aws/$PUBLIC_FRONTEND_REPO
-      - docker push public.ecr.aws/$PUBLIC_BACKEND_REPO
-      - echo "Creating imagedefinitions.json..."
-      - printf '[{"name":"FE-container","imageUri":"public.ecr.aws/%s"},{"name":"backend-container","imageUri":"public.ecr.aws/%s"}]' \
-        $PUBLIC_FRONTEND_REPO $PUBLIC_BACKEND_REPO > imagedefinitions.json
+      - echo "Pushing both images to ECR Public..."
+      - docker push $FRONTEND_REPO
+      - docker push $BACKEND_REPO
+
+      - echo "Creating two image definition files..."
+
+      # 1) imagedefinitions-frontend.json
+      - printf '[{"name":"FE-container","imageUri":"$FRONTEND_REPO"}]' \
+        > imagedefinitions-frontend.json
+
+      # 2) imagedefinitions-backend.json
+      - printf '[{"name":"backend-container","imageUri":"$BACKEND_REPO"}]' \
+        > imagedefinitions-backend.json
 
 artifacts:
   files:
-    - imagedefinitions.json
+    - imagedefinitions-frontend.json
+    - imagedefinitions-backend.json
 
 cache:
   paths:
-    - "/root/.npm"
-    - "frontend/node_modules"
-    - "backend/node_modules"
+    - /root/.npm
+    - frontend/node_modules
+    - backend/node_modules

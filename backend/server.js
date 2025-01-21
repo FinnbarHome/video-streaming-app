@@ -32,6 +32,15 @@ app.use(morgan('combined'));
 // Initialize Passport
 app.use(passport.initialize());
 
+// MongoDB URI from .env
+const MONGO_URI = process.env.MONGO_URI;
+if (!MONGO_URI) {
+  console.error('MONGO_URI is not defined in the .env file');
+  process.exit(1);
+}
+
+console.log(`Connecting to MongoDB: ${MONGO_URI}`);
+
 // Connect to MongoDB Atlas
 if (require.main === module) {
   connectDB();
