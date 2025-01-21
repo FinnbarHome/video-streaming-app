@@ -78,12 +78,15 @@ const seedDatabase = async () => {
     .filter((entry) => entry);
 
   try {
-    await Video.insertMany(entries);
-    console.log("Database seeded successfully");
+    const result = await Video.insertMany(entries);
+    console.log(
+      `Database seeded successfully. ${result.length} entries added.`
+    );
   } catch (err) {
     console.error("Error seeding database:", err);
   } finally {
     mongoose.disconnect();
+    console.log("Disconnected from MongoDB.");
   }
 };
 
