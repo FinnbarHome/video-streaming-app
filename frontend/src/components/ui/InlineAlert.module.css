@@ -1,0 +1,26 @@
+.alert {
+  width: 100%;
+  max-width: 980px;
+  margin: 14px auto 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.title {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.message {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.danger {
+  border-color: rgba(229, 9, 20, 0.35);
+  background: rgba(229, 9, 20, 0.12);
+}
+
+

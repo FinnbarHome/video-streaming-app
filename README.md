@@ -41,22 +41,13 @@ To run this project, ensure the following are installed:
 
 - [Docker](https://www.docker.com/get-started)
 - [Docker Compose](https://docs.docker.com/compose/)
-- [MongoDB](https://www.mongodb.com/try/download/community) (for local MongoDB deployment, or use MongoDB Atlas)
-- [Git Bash](https://git-scm.com/) (if you’re using Windows)
 - [Node.js](https://nodejs.org/en/)
 
-### MongoDB Connection
+MongoDB is started automatically via Docker Compose (no separate Mongo install required).
 
-You can use either:
+Optional:
 
-- A locally hosted MongoDB connection string, such as:
-  ```plaintext
-  mongodb://localhost:27017
-  ```
-- A MongoDB Atlas connection string in the format:
-  ```plaintext
-  mongodb+srv://<username>:<password>@<cluster>.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
-  ```
+- [Git Bash](https://git-scm.com/) or WSL (required if you want to run `setup.sh` on Windows)
 
 ## Project Setup
 
@@ -71,19 +62,34 @@ cd video-streaming-platform
 
 ### 2. Configure Environment Variables
 
-Create a `.env` file in the root directory and add the following variables:
+Create a `.env` file in the root directory. A template is provided in `env.example`.
+
+On Windows PowerShell:
+
+```bash
+copy env.example .env
+```
+
+On macOS/Linux:
+
+```bash
+cp env.example .env
+```
+
+Your `.env` should contain values like:
 
 ```env
-MONGO_URI=mongodb://localhost:27017
+DOCKER_MONGO_URI=mongodb://mongo:27017/videostreaming
 BACKEND_PORT=5000
-JWT_SECRET=your_secret_key
+DOCKER_JWT_SECRET=your_secret_key
 VITE_API_BASE_URL=http://localhost:5000/api
 FRONTEND_PORT=8081
 VIDEO_HOST_PORT=3000
+VIDEO_PUBLIC_BASE_URL=http://localhost:3000/videos
 ```
 
-- Replace `MONGO_URI` with your MongoDB connection string if different (e.g., a MongoDB Atlas URI).
-- Set a secure value for `JWT_SECRET`.
+- Set a secure value for `DOCKER_JWT_SECRET`.
+- Note: `setup.sh` also supports legacy keys `MONGO_URI` / `JWT_SECRET` and will map them automatically.
 
 ### 3. Add Videos
 
@@ -104,18 +110,26 @@ The `db-seeder` container automatically processes these files, extracting metada
 
 ### 4. Run the Application
 
-To start the application, run the provided shell script:
+To start the application (and seed the DB) using the single setup script:
 
 ```bash
 ./setup.sh
 ```
 
-#### What the Script Does:
+Windows note: run `setup.sh` from **Git Bash** or **WSL** (not PowerShell).
 
-1. Validates the `.env` file to ensure all required variables are set.
-2. Clears existing entries in the database if any exist.
-3. Seeds the database with video metadata from the `video-host/videos` directory.
-4. Starts the application using Docker Compose.
+What it does:
+
+- Validates `.env` (if present)
+- Starts MongoDB + backend + frontend + video-host via Docker Compose
+- Clears and re-seeds the `videos` collection from `video-host/videos`
+
+If you prefer to run commands manually instead of `setup.sh`:
+
+```bash
+docker compose up --build -d
+docker compose --profile seed run --rm db-seeder
+```
 
 ### 5. Access the Application
 
@@ -135,9 +149,9 @@ To start the application, run the provided shell script:
 
 ### Common Issues
 
-- **MongoDB Connection Issues:**
-  - Ensure your MongoDB instance is running.
-  - Check the `MONGO_URI` value in your `.env` file. If using Atlas, ensure credentials are correct.
+- **MongoDB Connection Issues (Docker):**
+  - Ensure Docker Desktop is running.
+  - Check that `DOCKER_MONGO_URI` is `mongodb://mongo:27017/videostreaming` when using Docker Compose.
 - **Port Conflicts:**
   - Verify that the ports `5000`, `8081`, and `3000` are not in use. If needed, update them in the `.env` file and `docker-compose.yml`.
 - **Permission Issues:**

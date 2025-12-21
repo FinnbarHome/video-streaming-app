@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from './Watchlist.module.css';
+import NavBar from './NavBar';
+import Spinner from './ui/Spinner';
+import InlineAlert from './ui/InlineAlert';
+import { apiFetch, ApiError } from '../lib/api';
 
 interface Video {
   _id: string;
@@ -10,24 +13,28 @@ interface Video {
   thumbnailUrl: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const Watchlist: React.FC = () => {
-  const navigate = useNavigate();
   const [videos, setVideos] = useState<Video[]>([]);
   const userId = localStorage.getItem('userId');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchWatchlist = async () => {
       if (!userId) return;
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/users/${userId}/watchlist`,
-        );
-        const data = await response.json();
+        setIsLoading(true);
+        setError(null);
+        const data = await apiFetch<Video[]>(`/users/${userId}/watchlist`);
         setVideos(data);
       } catch (err) {
-        console.error('Failed to fetch watchlist:', err);
+        if (err instanceof ApiError) {
+          setError(err.message);
+        } else {
+          setError('Failed to load watchlist.');
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchWatchlist();
@@ -37,40 +44,33 @@ const Watchlist: React.FC = () => {
   const removeFromWatchlist = async (videoId: string) => {
     if (!userId) return;
     try {
-      const response = await fetch(
-        `${API_BASE_URL}/users/${userId}/watchlist/${videoId}`,
-        {
-          method: 'DELETE',
-        },
-      );
-      const data = await response.json();
-      if (!response.ok) {
-        console.error('Error removing from watchlist:', data.error);
-        return;
-      }
+      setError(null);
+      await apiFetch(`/users/${userId}/watchlist/${videoId}`, {
+        method: 'DELETE',
+      });
       // Update local state: filter out the removed video
       setVideos((prev) => prev.filter((vid) => vid._id !== videoId));
     } catch (err) {
-      console.error('Failed to remove from watchlist:', err);
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('Failed to remove video.');
+      }
     }
   };
 
   return (
     <div className={styles.watchlistPage}>
-      <nav className={styles.navbar}>
-        <div className={styles.navbarLeft}>
-          <h1 className={styles.logo}>The Streamy Place</h1>
-          <ul className={styles.navLinks}>
-            <li onClick={() => navigate('/dashboard')}>Home</li>
-            <li onClick={() => navigate('/watchlist')}>Watchlist</li>
-            <li onClick={() => navigate('/watchhistory')}>Watch History</li>
-          </ul>
-        </div>
-      </nav>
+      <NavBar />
 
       <div className={styles.content}>
         <h2>My Watchlist</h2>
-        {videos.length === 0 ? (
+        {error && (
+          <InlineAlert title="Watchlist" message={error} variant="danger" />
+        )}
+        {isLoading ? (
+          <Spinner label="Loading watchlist" />
+        ) : videos.length === 0 ? (
           <p>No videos in your watchlist yet.</p>
         ) : (
           <div className={styles.gridContainer}>
@@ -79,9 +79,8 @@ const Watchlist: React.FC = () => {
                 <img src={video.thumbnailUrl} alt={video.videoName} />
                 <h3>{video.videoName}</h3>
                 <p>{video.videoDescription}</p>
-
-                {/* Remove button */}
                 <button
+                  type="button"
                   onClick={() => removeFromWatchlist(video._id)}
                   style={{ marginTop: '10px' }}
                 >

@@ -10,8 +10,8 @@ COPY package*.json ./
 # Install only production dependencies
 RUN npm install --production --no-cache
 
-# Copy the rest of the application files
-COPY . .
+# Copy only the server 
+COPY server.js ./
 
 # Accept port as a build argument
 ARG PORT=3000
