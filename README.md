@@ -62,19 +62,7 @@ cd video-streaming-platform
 
 ### 2. Configure Environment Variables
 
-Create a `.env` file in the root directory. A template is provided in `env.example`.
-
-On Windows PowerShell:
-
-```bash
-copy env.example .env
-```
-
-On macOS/Linux:
-
-```bash
-cp env.example .env
-```
+Create a `.env` file in the root directory.
 
 Your `.env` should contain values like:
 
