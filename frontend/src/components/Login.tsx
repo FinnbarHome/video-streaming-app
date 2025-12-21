@@ -1,73 +1,87 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import styles from './Login.module.css';
+import { apiFetch, ApiError } from '../lib/api';
+import { setAuth } from '../lib/auth';
 
 const Login: React.FC = () => {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-  console.log(`Api base url is set as: ${API_BASE_URL}`);
+  const validate = () => {
+    if (!username.trim() || !password.trim()) {
+      setError('Please enter a username and password.');
+      return false;
+    }
+    return true;
+  };
 
   const handleLogin = async () => {
     setError('');
     try {
-      const response = await fetch(`${API_BASE_URL}/users/login`, {
+      setIsSubmitting(true);
+      const data = await apiFetch<{
+        token: string;
+        userId: string;
+        username: string;
+      }>('/users/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      const data = await response.json();
 
-      if (!response.ok) {
-        setError(data.error || 'Login failed. Please try again.');
-      } else {
-        console.log('Login success:', data);
-        // data.token is our JWT
-        localStorage.setItem('token', data.token);
-        // We can still store userId if we want
-        localStorage.setItem('userId', data.userId);
-        localStorage.setItem('username', data.username);
-        // Now navigate
-        navigate('/dashboard');
-      }
+      setAuth({
+        token: data.token,
+        userId: data.userId,
+        username: data.username,
+      });
+      navigate('/dashboard');
     } catch (err) {
-      console.error('Login Error:', err);
-      setError('Something went wrong. Please try again.');
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleRegister = async () => {
     setError('');
     try {
-      const response = await fetch(`${API_BASE_URL}/users/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data.error || 'Registration failed. Please try again.');
-      } else {
-        console.log('Registration success:', data);
-        // Store userId in localStorage
-        localStorage.setItem('userId', data.userId);
-        localStorage.setItem('username', data.username);
+      setIsSubmitting(true);
+      const registered = await apiFetch<{ userId: string; username: string }>(
+        '/users/register',
+        {
+          method: 'POST',
+          body: JSON.stringify({ username, password }),
+        },
+      );
 
-        // navigate to dashboard
-        navigate('/dashboard');
-      }
+      setAuth({
+        userId: registered.userId,
+        username: registered.username,
+        token: null,
+      });
+      await handleLogin();
     } catch (err) {
-      console.error('Register Error:', err);
-      setError('Something went wrong. Please try again.');
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
     if (isRegisterMode) {
       handleRegister();
     } else {
@@ -88,6 +102,8 @@ const Login: React.FC = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className={styles.loginInput}
+            autoComplete="username"
+            disabled={isSubmitting}
           />
           <input
             type="password"
@@ -95,10 +111,16 @@ const Login: React.FC = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className={styles.loginInput}
+            autoComplete={isRegisterMode ? 'new-password' : 'current-password'}
+            disabled={isSubmitting}
           />
 
           <button type="submit" className={styles.loginButton}>
-            {isRegisterMode ? 'Register' : 'Login'}
+            {isSubmitting
+              ? 'Please wait…'
+              : isRegisterMode
+                ? 'Register'
+                : 'Login'}
           </button>
         </form>
 
@@ -106,6 +128,8 @@ const Login: React.FC = () => {
           style={{ marginTop: '10px', width: '100%' }}
           className={styles.loginButton}
           onClick={() => setIsRegisterMode(!isRegisterMode)}
+          type="button"
+          disabled={isSubmitting}
         >
           {isRegisterMode
             ? 'Already have an account? Click here to Login'
@@ -115,7 +139,6 @@ const Login: React.FC = () => {
         {error && <p className={styles.loginError}>{error}</p>}
       </div>
 
-      {/* Image credit */}
       <div className={styles.imageCredit}>
         Image by{' '}
         <a

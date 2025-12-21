@@ -6,6 +6,25 @@ const dotenv = require("dotenv");
 // Load environment variables from .env file
 dotenv.config();
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function connectWithRetry(uri, retries = 30, delayMs = 1000) {
+  let lastErr;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await mongoose.connect(uri);
+      return;
+    } catch (err) {
+      lastErr = err;
+      console.error(
+        `MongoDB connection attempt ${attempt}/${retries} failed: ${err.message}`
+      );
+      await sleep(delayMs);
+    }
+  }
+  throw lastErr;
+}
+
 // MongoDB URI from .env
 const MONGO_URI = process.env.MONGO_URI;
 if (!MONGO_URI) {
@@ -13,9 +32,11 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
-// API Base URL from .env
+// Video URLs stored in Mongo must be reachable from the host browser.
 const VIDEO_HOST_PORT = process.env.VIDEO_HOST_PORT;
-const apiBaseUrl = `http://localhost:${VIDEO_HOST_PORT}/videos`;
+const apiBaseUrl =
+  process.env.VIDEO_PUBLIC_BASE_URL ||
+  `http://localhost:${VIDEO_HOST_PORT}/videos`;
 
 if (!apiBaseUrl) {
   console.error("API_BASE_URL is not defined in the .env file");
@@ -24,15 +45,7 @@ if (!apiBaseUrl) {
 
 console.log(`Connecting to MongoDB: ${MONGO_URI}`);
 console.log(`Using Video Host Port: ${VIDEO_HOST_PORT}`);
-
-// Connect to MongoDB
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => {
-    console.error("MongoDB connection error:", err);
-    process.exit(1);
-  });
+console.log(`Using VIDEO_PUBLIC_BASE_URL: ${apiBaseUrl}`);
 
 // Define Video schema
 const videoSchema = new mongoose.Schema({
@@ -46,13 +59,17 @@ const videoSchema = new mongoose.Schema({
 const Video = mongoose.model("Video", videoSchema, "videos");
 
 // Determine the directory path dynamically
-const videoDir = path.join(__dirname, "..", "video-host", "videos");
+const videoDir =
+  process.env.VIDEO_DIR || path.join(__dirname, "..", "video-host", "videos");
 if (!fs.existsSync(videoDir)) {
   console.error(`Directory does not exist: ${videoDir}`);
   process.exit(1);
 }
 
 const seedDatabase = async () => {
+  await connectWithRetry(MONGO_URI);
+  console.log("Connected to MongoDB");
+
   const files = fs.readdirSync(videoDir);
 
   const videos = files.filter((file) => file.endsWith(".mp4"));

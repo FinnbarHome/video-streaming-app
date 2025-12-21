@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import styles from './WatchHistory.module.css';
+import NavBar from './NavBar';
+import Spinner from './ui/Spinner';
+import InlineAlert from './ui/InlineAlert';
+import { apiFetch, ApiError } from '../lib/api';
 
 interface Video {
   _id: string;
@@ -10,22 +13,29 @@ interface Video {
   thumbnailUrl: string;
 }
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 const WatchHistory: React.FC = () => {
-  const navigate = useNavigate();
   const [videos, setVideos] = useState<Video[]>([]);
   const userId = localStorage.getItem('userId');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
       if (!userId) return;
       try {
-        const response = await fetch(`${API_BASE_URL}/users/${userId}/history`);
-        const data = await response.json();
+        setIsLoading(true);
+        setError(null);
+        const data = await apiFetch<Video[]>(`/users/${userId}/history`);
         setVideos(data);
       } catch (err) {
-        console.error('Failed to fetch history:', err);
+        if (err instanceof ApiError) {
+          setError(err.message);
+        } else {
+          setError('Failed to load watch history.');
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchHistory();
@@ -35,44 +45,45 @@ const WatchHistory: React.FC = () => {
   const clearHistory = async () => {
     if (!userId) return;
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}/history`, {
-        method: 'DELETE',
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        console.error('Error clearing history:', data.error);
-        return;
-      }
+      setIsClearing(true);
+      setError(null);
+      await apiFetch(`/users/${userId}/history`, { method: 'DELETE' });
       // Clear local state so UI updates
       setVideos([]);
     } catch (err) {
-      console.error('Failed to clear history:', err);
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('Failed to clear watch history.');
+      }
+    } finally {
+      setIsClearing(false);
     }
   };
 
   return (
     <div className={styles.historyPage}>
-      <nav className={styles.navbar}>
-        <div className={styles.navbarLeft}>
-          <h1 className={styles.logo}>The Streamy Place</h1>
-          <ul className={styles.navLinks}>
-            <li onClick={() => navigate('/dashboard')}>Home</li>
-            <li onClick={() => navigate('/watchlist')}>Watchlist</li>
-            <li onClick={() => navigate('/watchhistory')}>Watch History</li>
-          </ul>
-        </div>
-      </nav>
+      <NavBar />
 
       <div className={styles.content}>
         <h2>My Watch History</h2>
-        {/* Clear History Button */}
+        {error && (
+          <InlineAlert title="Watch History" message={error} variant="danger" />
+        )}
         {videos.length > 0 && (
-          <button onClick={clearHistory} style={{ marginBottom: '20px' }}>
-            Clear All History
+          <button
+            type="button"
+            onClick={clearHistory}
+            style={{ marginBottom: '20px' }}
+            disabled={isClearing}
+          >
+            {isClearing ? 'Clearing…' : 'Clear All History'}
           </button>
         )}
 
-        {videos.length === 0 ? (
+        {isLoading ? (
+          <Spinner label="Loading watch history" />
+        ) : videos.length === 0 ? (
           <p>You haven’t watched any videos yet.</p>
         ) : (
           <div className={styles.gridContainer}>

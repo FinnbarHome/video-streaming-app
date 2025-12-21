@@ -3,97 +3,87 @@
 # Ensure the script exits if any command fails
 set -e
 
-# Remove the generated .env file if it exists
-rm -rf generated.env
-
-# Remove the db-seeder generated .env file if it exists
-rm -rf db-seeder/.env
-
 # Stop and remove any existing Docker containers
-docker-compose down
+docker compose down
 
-# Define the path to the original .env file
-ORIGINAL_ENV_FILE=".env"
+get_env_value() {
+  # Reads VAR=value from .env, returns value (strips trailing CR for Windows line endings)
+  local key="$1"
+  local line
+  line="$(grep -E "^${key}=" .env 2>/dev/null | head -n 1 | cut -d '=' -f2-)"
+  printf "%s" "${line}" | tr -d '\r'
+}
 
-# Define the path to the temporary .env file
-GENERATED_ENV_FILE="generated.env"
+env_key_present_but_empty() {
+  local key="$1"
+  grep -Eq "^${key}=" .env 2>/dev/null || return 1
+  local val
+  val="$(get_env_value "$key")"
+  [[ -z "$val" ]]
+}
 
-# Check if the .env file exists in the main directory
-if [ ! -f "$ORIGINAL_ENV_FILE" ]; then
-    echo "Error: $ORIGINAL_ENV_FILE not found in the main directory."
-    exit 1
-fi
+# If .env exists, validate any provided keys aren't empty and map legacy keys -> DOCKER_* keys.
+if [ -f ".env" ]; then
+  echo "Validating environment variables in .env..."
 
-# List of required environment variables
-REQUIRED_VARS=("MONGO_URI" "BACKEND_PORT" "JWT_SECRET" "VITE_API_BASE_URL" "FRONTEND_PORT" "VIDEO_HOST_PORT")
-
-# Validate that all required variables are set
-echo "Validating environment variables in $ORIGINAL_ENV_FILE..."
-for var in "${REQUIRED_VARS[@]}"; do
-    value=$(grep -E "^$var=" "$ORIGINAL_ENV_FILE" | cut -d '=' -f2-)
-    if [[ -z "$value" ]]; then
-        echo "Error: $var is not set in $ORIGINAL_ENV_FILE. Please set it and try again."
-        exit 1
+  # If a key exists but has an empty value, fail fast.
+  for key in DOCKER_MONGO_URI MONGO_URI DOCKER_JWT_SECRET JWT_SECRET BACKEND_PORT FRONTEND_PORT VIDEO_HOST_PORT VITE_API_BASE_URL VIDEO_PUBLIC_BASE_URL; do
+    if env_key_present_but_empty "$key"; then
+      echo "Error: $key is present but empty in .env. Please set it and try again."
+      exit 1
     fi
+  done
 
-    # Specific check for MONGO_URI being still set to [YOUR_MONGO_URI]
-    if [[ "$var" == "MONGO_URI" && "$value" == "[YOUR_MONGO_URI]" ]]; then
-        echo "Error: MONGO_URI is still set to [YOUR_MONGO_URI] in $ORIGINAL_ENV_FILE."
-        echo "Please set MONGO_URI to your actual MongoDB connection string and try again."
-        exit 1
+  # Backwards-compat: allow older .env files using MONGO_URI/JWT_SECRET.
+  if [[ -z "${DOCKER_MONGO_URI}" ]]; then
+    DOCKER_MONGO_URI_FILE="$(get_env_value DOCKER_MONGO_URI)"
+    MONGO_URI_FILE="$(get_env_value MONGO_URI)"
+    if [[ -n "${DOCKER_MONGO_URI_FILE}" ]]; then
+      export DOCKER_MONGO_URI="${DOCKER_MONGO_URI_FILE}"
+    elif [[ -n "${MONGO_URI_FILE}" ]]; then
+      export DOCKER_MONGO_URI="${MONGO_URI_FILE}"
     fi
-done
+  fi
 
-# Generate a new .env file
-echo "Generating $GENERATED_ENV_FILE..."
-> "$GENERATED_ENV_FILE" # Clear the file before appending
+  if [[ -z "${DOCKER_JWT_SECRET}" ]]; then
+    DOCKER_JWT_SECRET_FILE="$(get_env_value DOCKER_JWT_SECRET)"
+    JWT_SECRET_FILE="$(get_env_value JWT_SECRET)"
+    if [[ -n "${DOCKER_JWT_SECRET_FILE}" ]]; then
+      export DOCKER_JWT_SECRET="${DOCKER_JWT_SECRET_FILE}"
+    elif [[ -n "${JWT_SECRET_FILE}" ]]; then
+      export DOCKER_JWT_SECRET="${JWT_SECRET_FILE}"
+    fi
+  fi
 
-while IFS= read -r line; do
-    if [[ "$line" =~ ^MONGO_URI=(.*)$ ]]; then
-        BASE_MONGO_URI="${BASH_REMATCH[1]}"
-
-        # Separate URI into base and query parameters
-        URI_WITHOUT_QUERY=$(echo "$BASE_MONGO_URI" | sed -E 's|\?.*||')
-        QUERY_STRING=$(echo "$BASE_MONGO_URI" | grep -oE '\?.*' || echo "")
-
-        # Append /videostreaming before the query string
-        if [[ "$URI_WITHOUT_QUERY" == */ ]]; then
-            URI_WITHOUT_QUERY="${URI_WITHOUT_QUERY%/}"
-        fi
-        FINAL_MONGO_URI="${URI_WITHOUT_QUERY}/videostreaming${QUERY_STRING}"
-
-        # Append the updated MONGO_URI to the generated file
-        echo "MONGO_URI=${FINAL_MONGO_URI}" >> "$GENERATED_ENV_FILE"
+  # Default VIDEO_PUBLIC_BASE_URL if missing (keeps URLs browser-reachable)
+  if [[ -z "${VIDEO_PUBLIC_BASE_URL}" ]]; then
+    VIDEO_PUBLIC_BASE_URL_FILE="$(get_env_value VIDEO_PUBLIC_BASE_URL)"
+    if [[ -n "${VIDEO_PUBLIC_BASE_URL_FILE}" ]]; then
+      export VIDEO_PUBLIC_BASE_URL="${VIDEO_PUBLIC_BASE_URL_FILE}"
     else
-        # Append other lines unchanged
-        echo "$line" >> "$GENERATED_ENV_FILE"
+      VIDEO_HOST_PORT_FILE="$(get_env_value VIDEO_HOST_PORT)"
+      VIDEO_HOST_PORT_EFFECTIVE="${VIDEO_HOST_PORT_FILE:-3000}"
+      export VIDEO_PUBLIC_BASE_URL="http://localhost:${VIDEO_HOST_PORT_EFFECTIVE}/videos"
     fi
-done < "$ORIGINAL_ENV_FILE"
-
-# Ensure VIDEO_HOST_PORT is included
-VIDEO_HOST_PORT=$(grep -E "^VIDEO_HOST_PORT=" "$ORIGINAL_ENV_FILE" | cut -d '=' -f2-)
-if [[ -n "$VIDEO_HOST_PORT" ]]; then
-    echo "VIDEO_HOST_PORT=$VIDEO_HOST_PORT" >> "$GENERATED_ENV_FILE"
+  fi
+else
+  echo "No .env found; using docker-compose.yml defaults."
+  echo "Tip: copy env.example to .env if you want to customize ports/secrets."
 fi
 
-# Copy the new .env file into db-seeder
-cp "$GENERATED_ENV_FILE" db-seeder/.env
+echo "Starting services..."
+docker compose up --build -d
 
-# Change to db-seeder directory
-cd db-seeder || exit
+echo "Seeding database (clears + re-seeds videos collection)..."
+docker compose --profile seed run --rm db-seeder
 
-# Install dependencies
-npm install
-
-# Run the clear-db.js script to clear existing entries
-echo "Clearing the database if entries exist..."
-node clear-db.js
-
-# Run the seed script
-node seed.js
-
-# Return to the main directory
-cd ..
-
-# Run Docker Compose, passing through the generated .env file
-docker-compose --env-file "generated.env" up --build
+echo "Done. Services are running."
+if [ -f ".env" ]; then
+  echo "Frontend: http://localhost:$(grep -E '^FRONTEND_PORT=' .env | cut -d '=' -f2-)"
+  echo "Backend:  http://localhost:$(grep -E '^BACKEND_PORT=' .env | cut -d '=' -f2-)/api"
+  echo "Videos:   http://localhost:$(grep -E '^VIDEO_HOST_PORT=' .env | cut -d '=' -f2-)/videos"
+else
+  echo "Frontend: http://localhost:8081"
+  echo "Backend:  http://localhost:5000/api"
+  echo "Videos:   http://localhost:3000/videos"
+fi

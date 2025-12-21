@@ -11,11 +11,30 @@ if (!MONGO_URI) {
   process.exit(1);
 }
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function connectWithRetry(uri, retries = 30, delayMs = 1000) {
+  let lastErr;
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      await mongoose.connect(uri);
+      return;
+    } catch (err) {
+      lastErr = err;
+      console.error(
+        `MongoDB connection attempt ${attempt}/${retries} failed: ${err.message}`
+      );
+      await sleep(delayMs);
+    }
+  }
+  throw lastErr;
+}
+
 // Define a function to clear the database
 const clearDatabase = async () => {
   try {
     // Connect to the database
-    await mongoose.connect(MONGO_URI);
+    await connectWithRetry(MONGO_URI);
 
     console.log("Connected to the database.");
 
